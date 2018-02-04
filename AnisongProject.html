@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <link rel="shortcut icon" href="icons/favicon_16.ico" type="image/x-icon">
+    <link rel="icon" href="icons/favicon.ico" type="image/x-icon">
+    <link type="text/css" href="include/bootstrap.css" rel="stylesheet">
+    <link type="text/css" href="include/APlayer.min.css" rel="stylesheet">
+    <link type="text/css" href="css/style.css" rel="stylesheet">
+    <title>Demo for Anisong Project</title>
+</head>
+<nav id="navbar" class="nav-bg noto-sc py-0">
+    <!--Positioned at top-->
+    <div id="navbar-container" class="container d-flex text-f6 align-items-center">
+        <a id="navbar-brand" href="#" class="mr-2">AnisonG</a>
+        <ul id="navbar-list" class="d-flex">
+            <li class="navbar-item active">
+                <a href="#">
+                    发现音乐
+                </a>
+            </li>
+            <li class="navbar-item">
+                <a href="#">
+                    我的音乐
+                </a>
+            </li>
+            <li class="navbar-item">
+                <a href="#">
+                    朋友
+                </a>
+            </li>
+        </ul>
+        <div class="ml-auto d-flex">
+            <a href="#">
+                <img src="image/avatar.jpg" class="avatar" />
+            </a>
+        </div>
+        <div class="col-3 d-flex">
+            <form>
+                <a class="icon-search my-auto" href="#">
+                    S
+                </a>
+                <input id="search-box" type="search" placeholder="搜索音乐、艺人、用户" aria-label="Search">
+            </form>
+        </div>
+    </div>
+</nav>
+<body class="noto-sc">
+<div class="container bg-f6 minw-800">
+    <div class="col-6 px-0">
+        <img id="disc-cover" src="image/disc_cover.jpg" />
+        <img id="disc-mask" src="image/disc_mask.png" />
+        <img id="disc-light" src="image/disc_light.png" />
+        <img id="disc-needle" src="image/disc_needle.png" />
+        <img id="disc-play" src="image/disc_play.png"/>
+    </div>
+    <div class="col-6 ml-auto mt-5 pl-5 minh">
+        <div id="quality" class="px-1 unselactable">
+            高质量
+        </div>
+        <div id="title">
+            動く、動く
+        </div>
+        <div id="description">
+            新潮社のWEBコミックサイト『くらげバンチ』にて連載の人気コミック『少女終末旅行』がTVアニメ化。終末の世界を旅する少女2人、水瀬いのり演じるチトと、久保ユリカ演じるユーリの人気声優による、オープニング・テーマがリリース!
+        </div>
+        <div>
+
+        </div>
+        <div id="info" class="mt-4 mr-4 pr-1">
+            <div id="artist" class="py-2">
+                <span class="note">歌手：</span><a href="#" class="link">チト</a>/<a href="#" class="link">ユーリ</a>
+            </div>
+            <div id="album" class="py-2">
+                <span class="note">所属专辑：</span><a href="#" class="link">TVアニメ「少女終末旅行」オープニングテーマ「動く、動く」</a>
+            </div>
+            <div id="playlist" class="py-2">
+                <span class="note">所在歌单：</span><a href="#" class="link">Sample Playlist</a>
+            </div>
+            <!--<div id="lyric" class="minh">-->
+                <!--暂无歌词-->
+            <!--</div>-->
+        </div>
+        <div class="icon-report mr-0 float-right">
+            <a href="#" class="">R</a>
+        </div>
+    </div>
+</div>
+<div id="player" class="container">
+    <!--Fixed at bottom-->
+    <div class="col-12">
+        <div id="player1" class="aplayer mx-auto"></div>
+    </div>
+</div>
+<script type="text/javascript" src="include/jquery.js"></script>
+<script type="text/javascript" src="include/popper.js"></script>
+<script type="text/javascript" src="include/bootstrap.js"></script>
+<script type="text/javascript" src="include/APlayer.min.js"></script>
+<script type="text/javascript" src="js/script.js"></script>
+</body>
+</html>

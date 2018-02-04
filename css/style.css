@@ -1,0 +1,290 @@
+/**
+ * Created by Yunzhe on 2018/2/4.
+ */
+
+body {
+    background-color: #FFE2E2;
+}
+
+ul {
+    list-style: none;
+    margin-bottom: 0;
+    padding-left: 0;
+}
+
+.nav-bg {
+    background-image: -webkit-linear-gradient(bottom, #FFC7C7 0, #ffd7d7 100%);
+    background-image: -o-linear-gradient(bottom, #FFC7C7 0, #ffd7d7 100%);
+    background-image: linear-gradient(to top, #FFC7C7 0, #ffd7d7 100%);
+    box-shadow: 0 0 5px black;
+}
+
+#navbar {
+    height: 4rem;
+    position: relative;
+    padding: .5rem;
+    z-index: 10;
+}
+
+#navbar-container {
+    height: 4rem;
+}
+
+#navbar-brand {
+    font-size: 2rem;
+    cursor: pointer;
+}
+
+#navbar-list {
+    cursor: pointer;
+    height: 4rem;
+}
+
+#navbar-list .active {
+    background-color: #e17b7b;
+}
+
+.navbar-item {
+    text-align: center;
+    width: 6.5rem;
+    font-size: 1.2rem;
+    line-height: 4rem;
+    -webkit-transition: background-color .25s;
+    -moz-transition: background-color .25s;
+    -ms-transition: background-color .25s;
+    -o-transition: background-color .25s;
+    transition: background-color .25s;
+}
+
+.navbar-item:hover {
+    background-color: #e17b7b;
+}
+
+.text-f6 {
+    color: #f6f6f6 !important;
+}
+
+@font-face {
+    font-family: "NotoJP";
+    src: url("../font/NotoSansCJKjp-Regular.otf");
+}
+
+@font-face {
+    font-family: "NotoSC";
+    src: url("../font/NotoSansCJKsc-Regular.otf");
+}
+
+.noto-jp {
+    font-family: NotoJP, sans-serif;
+}
+
+.noto-sc {
+    font-family: NotoSC, NotoJP, sans-serif;
+}
+
+#search-box {
+    text-indent: 2rem;
+    background-color: #e6b3b3;
+    color: #e5cece;
+    height: 2rem;
+    -webkit-border-radius: 2rem;
+    -moz-border-radius: 2px;
+    border-radius: 1rem;
+    border: none;
+    -webkit-transition: background-color .5s;
+    -moz-transition: background-color .5s;
+    -ms-transition: background-color .5s;
+    -o-transition: background-color .5s;
+    transition: background-color .5s;
+}
+
+#search-box::placeholder {
+    color: #f9e4e4;
+}
+
+#search-box:focus {
+    color: #7c6b6b;
+    background-color: #FFE2E2;
+}
+
+.over-hide {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+input:focus {
+    outline: none;
+}
+
+@font-face {
+    font-family: "icon";
+    src: url("../font/icon.woff");
+}
+
+a {
+    text-decoration: none;
+    color: inherit;
+}
+
+a:hover {
+    text-decoration: none;
+    color: inherit;
+}
+
+.icon-search {
+    font-size: 1rem;
+    font-family: icon, sans-serif;
+    position: absolute;
+    top: 0.25rem;
+    left: 1.75rem
+}
+
+.avatar {
+    height: 2.5rem;
+    border-radius: 1.5rem;
+    border: 2px solid #eeeeee;
+}
+
+#player {
+    position: fixed;
+    top: 90%;
+}
+
+.bg-f6 {
+    background-color: #f6f6f6;
+}
+
+.minw-800 {
+    min-width: 800px;
+}
+
+.minh {
+    min-height: 500px;
+}
+
+#disc-default {
+    position: absolute;
+    z-index: 0;
+    width: 100%;
+}
+
+#disc-cover {
+    position: absolute;
+    width: 100%;
+    transform: scale(0.63);
+    z-index: 1;
+    border-radius: 50%;
+}
+
+#disc-mask {
+    position: absolute;
+    z-index: 2;
+    width: 100%;
+    border-radius: 50%;
+}
+
+#disc-light {
+    transform: scale(0.92);
+    position: absolute;
+    z-index: 3;
+    width: 100%;
+    border-radius: 50%;
+}
+
+#disc-needle {
+    transform-origin: 15.15% 9.09%;
+    transform: translate(-15.15%, -9.09%) scale(0.25) rotateZ(-60deg);
+    position: absolute;
+    left: 50%;
+    width: 100%;
+    border-bottom-left-radius: 100%;
+    z-index: 4;
+    -webkit-transition: transform .5s;
+    -moz-transition: transform .5s;
+    -ms-transition: transform .5s;
+    -o-transition: transform .5s;
+    transition: transform .5s;
+}
+
+#disc-play {
+    position: absolute;
+    width: 100%;
+    transform: scale(0.2);
+    z-index: 5;
+    border-radius: 50%;
+    opacity: 1;
+    -webkit-transition: opacity .25s;
+    -moz-transition: opacity .25s;
+    -ms-transition: opacity .25s;
+    -o-transition: opacity .25s;
+    transition: opacity .25s;
+    cursor: pointer;
+}
+
+.unselactable {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+#quality {
+    position: absolute;
+    top: 1rem;
+    font-size: .8rem;
+    /*background-color: #8785A2;*/
+    background-color: #28a745;
+    color: #f6f6f6;
+    border-radius: .3rem;
+    font-weight: 600;
+}
+
+#title {
+    text-indent: 3rem;
+    font-size: 3rem;
+    line-height: 5rem;
+}
+
+#description {
+    padding-left: 3rem;
+    color: #bbbbbb;
+}
+
+#info {
+    border-right: 2px solid #dddddd;
+}
+
+#artist {
+    font-size: 1.2rem;
+}
+
+#album {
+    font-size: 1.2rem;
+}
+
+#playlist {
+    font-size: 1.2rem;
+}
+
+.note {
+    font-size: 1.1rem;
+    color: gray;
+}
+
+.link {
+    color: #8785A2;
+}
+
+.link:hover {
+    color: #8785A2;
+    text-decoration: underline;
+}
+
+.icon-report {
+    font-family: icon, sans-serif;
+    color: #8785A2;
+    font-size: 1.2rem;
+    line-height: 1.5rem;
+    margin-top: -1.5rem;
+}
