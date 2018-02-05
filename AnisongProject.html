@@ -2,9 +2,10 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <link rel="shortcut icon" href="icons/favicon_16.ico" type="image/x-icon">
-    <link rel="icon" href="icons/favicon.ico" type="image/x-icon">
+    <link rel="shortcut icon" href="icon/favicon_16.ico" type="image/x-icon">
+    <link rel="icon" href="icon/favicon.ico" type="image/x-icon">
     <link type="text/css" href="include/bootstrap.css" rel="stylesheet">
+    <link type="text/css" href="include/open-iconic.css" rel="stylesheet">
     <link type="text/css" href="include/APlayer.min.css" rel="stylesheet">
     <link type="text/css" href="css/style.css" rel="stylesheet">
     <title>Demo for Anisong Project</title>
@@ -32,7 +33,7 @@
         </ul>
         <div class="ml-auto d-flex">
             <a href="#">
-                <img src="image/avatar.jpg" class="avatar" />
+                <img src="image/avatar.jpg" class="avatar"/>
             </a>
         </div>
         <div class="col-3 d-flex">
@@ -40,62 +41,116 @@
                 <a class="icon-search my-auto" href="#">
                     S
                 </a>
-                <input id="search-box" type="search" placeholder="搜索音乐、艺人、用户" aria-label="Search">
+                <input id="search-box" class="over-hide" type="search" placeholder="搜索音乐、艺人、用户" aria-label="Search">
             </form>
         </div>
     </div>
 </nav>
 <body class="noto-sc">
 <div class="container bg-f6 minw-800">
+    <div id="bg-image-container col-12">
+        <div class="container">
+            <div class="col-12">
+                <img id="bg-image" src="http://api.anisong.niconi.cc/image/girlslasttourOP.jpg">
+            </div>
+        </div>
+    </div>
     <div class="col-6 px-0">
-        <img id="disc-cover" src="image/disc_cover.jpg" />
-        <img id="disc-mask" src="image/disc_mask.png" />
-        <img id="disc-light" src="image/disc_light.png" />
-        <img id="disc-needle" src="image/disc_needle.png" />
-        <img id="disc-play" src="image/disc_play.png"/>
+        <div class="container no-gutters">
+            <div id="disc-group" class="col-12">
+                <img id="disc-cover" src="http://api.anisong.niconi.cc/image/girlslasttourOP.jpg"/>
+                <img id="disc-mask" src="image/disc_mask.png"/>
+                <img id="disc-light" src="image/disc_light.png"/>
+                <img id="disc-play" src="image/disc_play.png"/>
+            </div>
+        </div>
+        <img id="disc-needle" src="image/disc_needle.png"/>
     </div>
     <div class="col-6 ml-auto mt-5 pl-5 minh">
         <div id="quality" class="px-1 unselactable">
-            高质量
+            <p>高质量</p>
         </div>
-        <div id="title">
+        <div id="count" class="unselactable" data-toggle="tooltip" data-html="true" data-placement="left"
+             title="播放数<br><hr>下载数">
+            <div id="count-switch"></div>
+            <p id="count-play">9</p>
+            <p id="count-download">9999</p>
+        </div>
+        <div id="title" class="col-auto my-3 mr-4" data-toggle="tooltip" data-placement="top" data-offset="-90%"
+             data-template='<div class="tooltip" role="tooltip"><div class="arrow"></div><div class="tooltip-inner title-tooltip"></div></div>'
+             title="Uploader: 絢瀬絵里">
             動く、動く
         </div>
-        <div id="description">
+        <div id="description" class="mr-4">
             新潮社のWEBコミックサイト『くらげバンチ』にて連載の人気コミック『少女終末旅行』がTVアニメ化。終末の世界を旅する少女2人、水瀬いのり演じるチトと、久保ユリカ演じるユーリの人気声優による、オープニング・テーマがリリース!
         </div>
-        <div>
-
+        <div class="container mt-2 mx-xl-5 mx-lg-2">
+            <div class="row">
+                <div id="btn-play"
+                     class="col-4 col-lg-auto btn-action btn-special btn-play ml-1 ml-xl-2 my-1 px-2 py-1">
+                    <span class="oi oi-play-circle"></span> 播放
+                </div>
+                <div id="btn-add" class="col-1 col-lg-auto btn-action btn-special btn-add mr-1 mr-xl-2 my-1 px-2 py-1">
+                    <span class="oi oi-list"></span>
+                </div>
+                <div id="btn-favorite" class="col-5 col-lg-auto btn-action btn-normal mx-1 mx-xl-2 my-1 pl-2 pr-3 py-1">
+                    <span class="oi oi-heart"></span> 收藏
+                </div>
+                <div id="btn-download" class="col-5 col-lg-auto btn-action btn-normal mx-1 mx-xl-2 my-1 pl-2 pr-3 py-1">
+                    <span class="oi oi-data-transfer-download"></span> 下载
+                </div>
+                <div id="btn-share" class="col-5 col-lg-auto btn-action btn-normal mx-1 mx-xl-2 my-1 pl-2 pr-3 py-1">
+                    <span class="oi oi-share-boxed"></span> 分享
+                </div>
+            </div>
         </div>
-        <div id="info" class="mt-4 mr-4 pr-1">
-            <div id="artist" class="py-2">
-                <span class="note">歌手：</span><a href="#" class="link">チト</a>/<a href="#" class="link">ユーリ</a>
+        <div id="info" class="mt-2 mr-4">
+            <div id="artist" class="py-2 pr-3">
+                <span class="note unselactable">歌手：</span><a href="#" class="link">チト</a>/<a href="#"
+                                                                                             class="link">ユーリ</a>
             </div>
-            <div id="album" class="py-2">
-                <span class="note">所属专辑：</span><a href="#" class="link">TVアニメ「少女終末旅行」オープニングテーマ「動く、動く」</a>
+            <div id="album" class="py-2 pr-3">
+                <span class="note unselactable">所属专辑：</span><a href="#" class="link">TVアニメ「少女終末旅行」オープニングテーマ「動く、動く」</a>
+                <a href="http://www.nexushd.org" target="_blank" class="float-right">
+                    <span class="oi oi-external-link external"></span>
+                </a>
             </div>
-            <div id="playlist" class="py-2">
-                <span class="note">所在歌单：</span><a href="#" class="link">Sample Playlist</a>
+            <div id="playlist" class="py-2 pr-3">
+                <span class="note unselactable">所在歌单：</span><a href="#" class="link">Sample Playlist</a>
+            </div>
+            <div id="tag" class="py-2 pr-3">
+                <span class="note unselactable">标签：</span>
+                <span class="oi oi-tag icon-tag" data-toggle="tooltip" data-html="true"
+                      title="<em>No preview</em>"></span>
+                <a href="#" class="link tag mr-3">OP</a>
+                <span class="oi oi-tag icon-tag" data-toggle="tooltip" data-html="true"
+                      title="<em>No preview</em>"></span>
+                <a href="#" class="link tag mr-3">17年10月番</a>
+                <span class="oi oi-tag icon-tag" data-toggle="tooltip" data-html="true"
+                      title="<img src='http://api.anisong.niconi.cc/image/girlslasttour.jpg' width=100 style='padding:0;'/>">
+                    </span>
+                <a href="#" class="link tag mr-3">少女终末旅行</a>
             </div>
             <!--<div id="lyric" class="minh">-->
-                <!--暂无歌词-->
+            <!--暂无歌词-->
             <!--</div>-->
         </div>
-        <div class="icon-report mr-0 float-right">
+        <div class="icon-report mr-0 float-right" data-toggle="tooltip" data-placement="top" title="信息有误？">
             <a href="#" class="">R</a>
         </div>
     </div>
 </div>
-<div id="player" class="container">
+<div id="player" class="aplayer mx-auto"></div>
+<div id="player-container" class="container-fluid no-gutters px-0">
     <!--Fixed at bottom-->
-    <div class="col-12">
-        <div id="player1" class="aplayer mx-auto"></div>
+    <div class="col-10 mx-auto">
     </div>
 </div>
 <script type="text/javascript" src="include/jquery.js"></script>
 <script type="text/javascript" src="include/popper.js"></script>
 <script type="text/javascript" src="include/bootstrap.js"></script>
 <script type="text/javascript" src="include/APlayer.min.js"></script>
+<script type="text/javascript" src="include/clipboard.js"></script>
 <script type="text/javascript" src="js/script.js"></script>
 </body>
 </html>
