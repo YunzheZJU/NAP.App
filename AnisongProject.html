@@ -6,7 +6,9 @@
     <link rel="icon" href="icon/favicon.ico" type="image/x-icon">
     <link type="text/css" href="include/bootstrap.css" rel="stylesheet">
     <link type="text/css" href="include/open-iconic.css" rel="stylesheet">
+    <link type="text/css" href="include/icomoon.css" rel="stylesheet">
     <link type="text/css" href="include/APlayer.min.css" rel="stylesheet">
+    <link type="text/css" href="include/popup.css" rel="stylesheet">
     <link type="text/css" href="css/style.css" rel="stylesheet">
     <title>Demo for Anisong Project</title>
 </head>
@@ -76,7 +78,8 @@
             <p id="count-play">9</p>
             <p id="count-download">9999</p>
         </div>
-        <div id="title" class="col-auto my-1 my-lg-2 my-xl-3 mr-4" data-toggle="tooltip" data-placement="top" data-offset="-55%"
+        <div id="title" class="col-auto my-1 my-lg-2 my-xl-3 mr-4" data-toggle="tooltip" data-placement="top"
+             data-offset="-55%"
              data-template='<div class="tooltip" role="tooltip"><div class="arrow"></div><div class="tooltip-inner title-tooltip"></div></div>'
              title="Uploader: 絢瀬絵里">
             動く、動く
@@ -105,7 +108,7 @@
             </div>
         </div>
         <div id="info" class=" mt-1 mt-lg-2 mt-xl-3 mr-4">
-            <table>
+            <table id="info-table">
                 <tr>
                     <th>
                         歌手
@@ -154,21 +157,6 @@
                     </td>
                 </tr>
             </table>
-            <!--<div id="artist" class="py-2 pr-3">-->
-            <!--<span class="note unselactable">歌手　　　</span><a href="#" class="link">チト</a>/<a href="#"-->
-            <!--class="link">ユーリ</a>-->
-            <!--</div>-->
-            <!--<div id="album" class="py-2 pr-3">-->
-
-
-            <!--</div>-->
-            <!--<div id="playlist" class="py-2 pr-3">-->
-
-            <!--</div>-->
-            <!--<div id="tag" class="py-2 pr-3">-->
-
-
-            <!--</div>-->
             <!--<div id="lyric" class="minh">-->
             <!--暂无歌词-->
             <!--</div>-->
@@ -178,14 +166,79 @@
         </div>
     </div>
 </div>
-<div id="player" class="aplayer mx-auto"></div>
+<div id="player" class="aplayer mx-auto" style="display: none"></div>
 <div id="player-container" class="container-fluid no-gutters px-0">
+    <div id="player-bg"></div>
     <!--Fixed at bottom-->
-    <div class="col-10 mx-auto">
+    <div class="col-12 col-lg-11 col-xl-10 mx-auto">
+        <div class="container-fluid px-0 d-flex">
+            <div class="col-3 col-xl-2 px-0">
+                <div class="container-fluid no-gutters d-flex px-0">
+                    <div class="col-4">
+                        <p class="text-center">
+                            <span id="control-previous" class="icomoon-previous icon-control"></span>
+                        </p>
+                    </div>
+                    <div class="col-4">
+                        <p class="text-center">
+                            <span id="control-toggle" class="icomoon-play2 icon-control"></span>
+                        </p>
+                    </div>
+                    <div class="col-4">
+                        <p class="text-center">
+                            <span id="control-next" class="icomoon-next icon-control"></span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6 col-xl-8 px-0">
+                <div class="container-fluid px-0 d-flex">
+                    <div class="text-time col-1 px-3">
+                        <p id="current-time">
+                            00:00
+                        </p>
+                    </div>
+                    <div id="progress-container" class="col-10 my-auto px-0">
+                        <div id="progress-indicator">
+                            <span id="icon-indicator-top" class="icomoon-radio-checked2"></span>
+                            <!--<span id="icon-indicator-bottom" class="icomoon-radio-checked"></span>-->
+                        </div>
+                        <div id="progress-go" class="progress">
+                            <div id="progress-loaded" class="progress-bar" role="progressbar"></div>
+                            <div id="progress-played" class="progress-bar progress-bar-animated"
+                                 role="progressbar"></div>
+                        </div>
+                    </div>
+                    <div class="text-time col-1 px-3">
+                        <p id="total-time">
+                            00:00
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-3 col-xl-2 px-0">
+                <div class="container-fluid px-0 d-flex">
+                    <div class="col-2">
+                        <p class="text-center">
+                            <span id="control-volume" class="icomoon-volume-medium icon-control"></span>
+                        </p>
+                    </div>
+                    <div class="col-8">
+
+                    </div>
+                    <div class="col-2">
+                        <p class="text-center">
+                            <span id="control-list" class="icomoon-menu4 icon-control"></span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 <script type="text/javascript" src="include/jquery.js"></script>
 <script type="text/javascript" src="include/popper.js"></script>
+<script type="text/javascript" src="include/jquery.popup.js"></script>
 <script type="text/javascript" src="include/bootstrap.js"></script>
 <script type="text/javascript" src="include/APlayer.min.js"></script>
 <script type="text/javascript" src="include/clipboard.js"></script>

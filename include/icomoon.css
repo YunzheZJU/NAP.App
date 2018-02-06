@@ -1,0 +1,109 @@
+@font-face {
+    font-family: 'icomoon';
+    src: url('../font/icomoon.eot?m8os3e');
+    src: url('../font/icomoon.eot?m8os3e#iefix') format('embedded-opentype'),
+    url('../font/icomoon.ttf?m8os3e') format('truetype'),
+    url('../font/icomoon.woff?m8os3e') format('woff'),
+    url('../font/icomoon.svg?m8os3e#icomoon') format('svg');
+    font-weight: normal;
+    font-style: normal;
+}
+
+[class^="icomoon-"], [class*=" icomoon-"] {
+    /* use !important to prevent issues with browser extensions that change fonts */
+    font-family: 'icomoon' !important;
+    speak: none;
+    font-style: normal;
+    font-weight: normal;
+    font-variant: normal;
+    text-transform: none;
+    line-height: 1;
+
+    /* Better Font Rendering =========== */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+.icomoon-spinner3:before {
+    content: "\e97c";
+}
+
+.icomoon-spinner11:before {
+    content: "\e984";
+}
+
+.icomoon-menu4:before {
+    content: "\e9c0";
+}
+
+.icomoon-notification:before {
+    content: "\ea08";
+}
+
+.icomoon-question:before {
+    content: "\ea09";
+}
+
+.icomoon-info:before {
+    content: "\ea0c";
+}
+
+.icomoon-cancel-circle:before {
+    content: "\ea0d";
+}
+
+.icomoon-play2:before {
+    content: "\ea15";
+}
+
+.icomoon-pause:before {
+    content: "\ea16";
+}
+
+.icomoon-previous:before {
+    content: "\ea18";
+}
+
+.icomoon-next:before {
+    content: "\ea19";
+}
+
+.icomoon-volume-high:before {
+    content: "\ea26";
+}
+
+.icomoon-volume-medium:before {
+    content: "\ea27";
+}
+
+.icomoon-volume-low:before {
+    content: "\ea28";
+}
+
+.icomoon-volume-mute:before {
+    content: "\ea29";
+}
+
+.icomoon-loop:before {
+    content: "\ea2d";
+}
+
+.icomoon-infinite:before {
+    content: "\ea2f";
+}
+
+.icomoon-shuffle:before {
+    content: "\ea30";
+}
+
+.icomoon-arrow-right2:before {
+    content: "\ea3c";
+}
+
+.icomoon-radio-checked:before {
+    content: "\ea54";
+}
+
+.icomoon-radio-checked2:before {
+    content: "\ea55";
+}
