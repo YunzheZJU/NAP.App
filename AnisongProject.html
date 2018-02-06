@@ -76,7 +76,7 @@
             <p id="count-play">9</p>
             <p id="count-download">9999</p>
         </div>
-        <div id="title" class="col-auto my-3 mr-4" data-toggle="tooltip" data-placement="top" data-offset="-55%"
+        <div id="title" class="col-auto my-1 my-lg-2 my-xl-3 mr-4" data-toggle="tooltip" data-placement="top" data-offset="-55%"
              data-template='<div class="tooltip" role="tooltip"><div class="arrow"></div><div class="tooltip-inner title-tooltip"></div></div>'
              title="Uploader: 絢瀬絵里">
             動く、動く
@@ -84,7 +84,7 @@
         <div id="description" class="mr-4">
             新潮社のWEBコミックサイト『くらげバンチ』にて連載の人気コミック『少女終末旅行』がTVアニメ化。終末の世界を旅する少女2人、水瀬いのり演じるチトと、久保ユリカ演じるユーリの人気声優による、オープニング・テーマがリリース!
         </div>
-        <div class="container mt-2 mx-xl-5 mx-lg-2">
+        <div class="container mt-1 mt-lg-2 mt-xl-3 mx-xl-5 mx-lg-2">
             <div class="row">
                 <div id="btn-play"
                      class="col-4 col-lg-auto btn-action btn-special btn-play ml-1 ml-xl-2 my-1 px-2 py-1">
@@ -94,43 +94,81 @@
                     <span class="oi oi-list"></span>
                 </div>
                 <div id="btn-favorite" class="col-5 col-lg-auto btn-action btn-normal mx-1 mx-xl-2 my-1 pl-2 pr-3 py-1">
-                    <span class="oi oi-heart"></span> 收藏
+                    <span class="oi oi-heart icon-action-normal"></span> 收藏
                 </div>
                 <div id="btn-download" class="col-5 col-lg-auto btn-action btn-normal mx-1 mx-xl-2 my-1 pl-2 pr-3 py-1">
-                    <span class="oi oi-data-transfer-download"></span> 下载
+                    <span class="oi oi-data-transfer-download icon-action-normal"></span> 下载
                 </div>
                 <div id="btn-share" class="col-5 col-lg-auto btn-action btn-normal mx-1 mx-xl-2 my-1 pl-2 pr-3 py-1">
-                    <span class="oi oi-share-boxed"></span> 分享
+                    <span class="oi oi-share-boxed icon-action-normal"></span> 分享
                 </div>
             </div>
         </div>
-        <div id="info" class="mt-2 mr-4">
-            <div id="artist" class="py-2 pr-3">
-                <span class="note unselactable">歌手：</span><a href="#" class="link">チト</a>/<a href="#"
-                                                                                             class="link">ユーリ</a>
-            </div>
-            <div id="album" class="py-2 pr-3">
-                <span class="note unselactable">所属专辑：</span><a href="#" class="link">TVアニメ「少女終末旅行」オープニングテーマ「動く、動く」</a>
-                <a href="http://www.nexushd.org" target="_blank" class="float-right">
-                    <span class="oi oi-external-link external"></span>
-                </a>
-            </div>
-            <div id="playlist" class="py-2 pr-3">
-                <span class="note unselactable">所在歌单：</span><a href="#" class="link">Sample Playlist</a>
-            </div>
-            <div id="tag" class="py-2 pr-3">
-                <span class="note unselactable">标签：</span>
-                <span class="oi oi-tag icon-tag" data-toggle="tooltip" data-html="true"
-                      title="<em>No preview</em>"></span>
-                <a href="#" class="link tag mr-3">OP</a>
-                <span class="oi oi-tag icon-tag" data-toggle="tooltip" data-html="true"
-                      title="<em>No preview</em>"></span>
-                <a href="#" class="link tag mr-3">17年10月番</a>
-                <span class="oi oi-tag icon-tag" data-toggle="tooltip" data-html="true"
-                      title="<img src='http://api.anisong.niconi.cc/image/girlslasttour.jpg' width=100 style='padding:0;'/>">
-                    </span>
-                <a href="#" class="link tag mr-3">少女终末旅行</a>
-            </div>
+        <div id="info" class=" mt-1 mt-lg-2 mt-xl-3 mr-4">
+            <table>
+                <tr>
+                    <th>
+                        歌手
+                    </th>
+                    <td id="artist">
+                        <a href="#" class="link">チト</a>/<a href="#" class="link">ユーリ</a>
+                    </td>
+                </tr>
+                <tr>
+                    <th>
+                        所属专辑
+                    </th>
+                    <td>
+                        <a href="#" class="link">TVアニメ「少女終末旅行」オープニングテーマ「動く、動く」</a>
+                        <a href="http://www.nexushd.org" target="_blank" class="float-right">
+                            <span class="oi oi-external-link external"></span>
+                        </a>
+                    </td>
+                </tr>
+                <tr>
+                    <th>
+                        所在歌单
+                    </th>
+                    <td>
+                        <a href="#" class="link">Sample Playlist</a>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2">
+                        <div class="float-left">
+                            <span class="oi oi-tag icon-tag" data-toggle="tooltip" data-html="true"
+                                  title="<em>No preview</em>"></span>
+                            <a href="#" class="link tag mr-3">OP</a>
+                        </div>
+                        <div class="float-left">
+                            <span class="oi oi-tag icon-tag" data-toggle="tooltip" data-html="true"
+                                  title="<em>No preview</em>"></span>
+                            <a href="#" class="link tag mr-3">17年10月番</a>
+                        </div>
+                        <div class="float-left">
+                            <span class="oi oi-tag icon-tag" data-toggle="tooltip" data-html="true"
+                                  title="<img src='http://api.anisong.niconi.cc/image/girlslasttour.jpg' width=100 style='padding:0;'/>">
+                            </span>
+                            <a href="#" class="link tag mr-3">少女终末旅行</a>
+                        </div>
+                    </td>
+                </tr>
+            </table>
+            <!--<div id="artist" class="py-2 pr-3">-->
+            <!--<span class="note unselactable">歌手　　　</span><a href="#" class="link">チト</a>/<a href="#"-->
+            <!--class="link">ユーリ</a>-->
+            <!--</div>-->
+            <!--<div id="album" class="py-2 pr-3">-->
+
+
+            <!--</div>-->
+            <!--<div id="playlist" class="py-2 pr-3">-->
+
+            <!--</div>-->
+            <!--<div id="tag" class="py-2 pr-3">-->
+
+
+            <!--</div>-->
             <!--<div id="lyric" class="minh">-->
             <!--暂无歌词-->
             <!--</div>-->
