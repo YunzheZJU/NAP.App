@@ -13,6 +13,9 @@ const $btn_play = $('#btn-play');
 const $btn_add = $('#btn-add');
 const $btn_favorite = $('#btn-favorite');
 const $btn_download = $('#btn-download');
+const $text_favorite = $('#text_favorite');
+const $text_download = $('#text_download');
+const $text_share = $('#text_share');
 const $description = $('#description');
 const $count = $('#count');
 const $count_play = $('#count-play');
@@ -26,13 +29,17 @@ const $prograss_go = $('#progress-go');
 const $prograss_played = $('#progress-played');
 const $prograss_loaded = $('#progress-loaded');
 const $prograss_indicator = $('#progress-indicator');
+const $volume_go = $('#volume-go');
+const $volume_value = $('#volume-value');
+const $volume_indicator = $('#volume-indicator');
+const rotation_speed = 0.2;
 let $aplayer_ptime;
 let $aplayer_dtime;
 let $aplayer_loaded;
 let $aplayer_played;
-const rotation_speed = 0.2;
 let ap;
 let musicInfo;
+let total_time;
 let listCount = 0;
 let isPlaying = false;
 let rotation = 0;
@@ -49,9 +56,9 @@ let popup_message = new $.Popup({
     closeContent: '',
     preloaderContent: '',
     containerClass: "popup-message",
-    afterOpen : function(){
+    afterOpen: function () {
         let popup = this;
-        setTimeout(function(){
+        setTimeout(function () {
             popup.close();
         }, 500);
     }
@@ -79,14 +86,22 @@ function onWidthChange() {
         descriptionToShow = description.substring(0, 30);
         $disc_group.css('top', '100px');
         needle_rotation_max = '20deg';
-    } else if (window.innerWidth < 1200) {
-        descriptionToShow = description.substring(0, 50);
-        $disc_group.css('top', '30px');
-        needle_rotation_max = '-12deg';
+        $text_favorite[0].innerText = '';
+        $text_download[0].innerText = '';
+        $text_share[0].innerText = '';
     } else {
-        descriptionToShow = description.substring(0, 70);
-        $disc_group.css('top', '10px');
-        needle_rotation_max = '-20deg';
+        $text_favorite[0].innerText = ' 收藏';
+        $text_download[0].innerText = ' 下载';
+        $text_share[0].innerText = ' 分享';
+        if (window.innerWidth < 1200) {
+            descriptionToShow = description.substring(0, 50);
+            $disc_group.css('top', '30px');
+            needle_rotation_max = '-12deg';
+        } else {
+            descriptionToShow = description.substring(0, 70);
+            $disc_group.css('top', '10px');
+            needle_rotation_max = '-20deg';
+        }
     }
     if ($('#collect').length) {
         spread();
@@ -161,11 +176,11 @@ function initiatePlayer(musicInfo) {
     });
     ap.on('playing', function () {
         if ($aplayer_ptime) {
-            console.log(ap.audio.currentTime);
+            // console.log(ap.audio.currentTime);
             const text_current_time = $aplayer_ptime.innerText;
             const text_total_time = $aplayer_dtime.innerText;
             const current_time = convertTime(text_current_time);
-            const total_time = convertTime(text_total_time);
+            total_time = convertTime(text_total_time);
             const percentage = current_time / total_time;
             const loaded = $aplayer_loaded.css('width');
             const played = $aplayer_played.css('width');
@@ -174,9 +189,7 @@ function initiatePlayer(musicInfo) {
             // console.log($prograss_go[0].offsetWidth);
             $prograss_loaded.css('width', loaded);
             $prograss_played.css('width', played);
-            $prograss_indicator.css('left', '' + indicator_offset + 'px');
-            // $prograss_played.attr('aria-valuenow', current_time);
-            // $prograss_played.attr('aria-valuemax', total_time);
+            $prograss_indicator.css('left', indicator_offset + 'px');
             $current_time[0].innerText = text_current_time;
             $total_time[0].innerText = $aplayer_dtime.innerText;
         } else {
@@ -185,6 +198,11 @@ function initiatePlayer(musicInfo) {
             $aplayer_loaded = $('.aplayer-loaded');
             $aplayer_played = $('.aplayer-played');
         }
+        const volume = ap.audio.volume;
+        const volume_width = $volume_go[0].offsetWidth;
+        const indicator_offset = ~~(volume * volume_width - 7);
+        $volume_value.css('width', volume * 100 + '%');
+        $volume_indicator.css('left', indicator_offset + 'px');
         console.log('playing');
     });
     ap.on('ended', function () {

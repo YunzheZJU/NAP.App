@@ -90,20 +90,20 @@
         <div class="container mt-1 mt-lg-2 mt-xl-3 mx-xl-5 mx-lg-2">
             <div class="row">
                 <div id="btn-play"
-                     class="col-4 col-lg-auto btn-action btn-special btn-play ml-1 ml-xl-2 my-1 px-2 py-1">
+                     class="col-auto btn-action btn-special btn-play ml-0 ml-lg-1 ml-xl-2 my-1 px-2 py-1">
                     <span class="oi oi-play-circle"></span> 播放
                 </div>
-                <div id="btn-add" class="col-1 col-lg-auto btn-action btn-special btn-add mr-1 mr-xl-2 my-1 px-2 py-1">
+                <div id="btn-add" class="col-auto btn-action btn-special btn-add mr-3 mr-lg-1 mr-xl-2 my-1 px-2 py-1">
                     <span class="oi oi-list"></span>
                 </div>
-                <div id="btn-favorite" class="col-5 col-lg-auto btn-action btn-normal mx-1 mx-xl-2 my-1 pl-2 pr-3 py-1">
-                    <span class="oi oi-heart icon-action-normal"></span> 收藏
+                <div id="btn-favorite" class="col-auto btn-action btn-normal mx-3 mx-lg-1 mx-xl-2 my-1 pl-2 pr-2 pr-lg-3 py-1">
+                    <span class="oi oi-heart icon-action-normal"></span><span id="text_favorite"> 收藏</span>
                 </div>
-                <div id="btn-download" class="col-5 col-lg-auto btn-action btn-normal mx-1 mx-xl-2 my-1 pl-2 pr-3 py-1">
-                    <span class="oi oi-data-transfer-download icon-action-normal"></span> 下载
+                <div id="btn-download" class="col-auto btn-action btn-normal mx-3 mx-lg-1 mx-xl-2 my-1 pl-2 pr-2 pr-lg-3 py-1">
+                    <span class="oi oi-data-transfer-download icon-action-normal"></span><span id="text_download"> 下载</span>
                 </div>
-                <div id="btn-share" class="col-5 col-lg-auto btn-action btn-normal mx-1 mx-xl-2 my-1 pl-2 pr-3 py-1">
-                    <span class="oi oi-share-boxed icon-action-normal"></span> 分享
+                <div id="btn-share" class="col-auto btn-action btn-normal mx-3 mx-lg-1 mx-xl-2 my-1 pl-2 pr-2 pr-lg-3 py-1">
+                    <span class="oi oi-share-boxed icon-action-normal"></span><span id="text_share"> 分享</span>
                 </div>
             </div>
         </div>
@@ -172,7 +172,7 @@
     <!--Fixed at bottom-->
     <div class="col-12 col-lg-11 col-xl-10 mx-auto">
         <div class="container-fluid px-0 d-flex">
-            <div class="col-3 col-xl-2 px-0">
+            <div class="col-3 col-md-2 px-0">
                 <div class="container-fluid no-gutters d-flex px-0">
                     <div class="col-4">
                         <p class="text-center">
@@ -191,17 +191,16 @@
                     </div>
                 </div>
             </div>
-            <div class="col-6 col-xl-8 px-0">
+            <div class="col-5 col-md-6 col-lg-7 px-0">
                 <div class="container-fluid px-0 d-flex">
-                    <div class="text-time col-1 px-3">
+                    <div class="text-time col-2 col-md-1 px-0 mr-3">
                         <p id="current-time">
                             00:00
                         </p>
                     </div>
-                    <div id="progress-container" class="col-10 my-auto px-0">
+                    <div id="progress-container" class="col-8 col-md-10 my-auto px-0">
                         <div id="progress-indicator">
-                            <span id="icon-indicator-top" class="icomoon-radio-checked2"></span>
-                            <!--<span id="icon-indicator-bottom" class="icomoon-radio-checked"></span>-->
+                            <span id="icon-progress-indicator" class="icomoon-radio-checked2 icon-indicator"></span>
                         </div>
                         <div id="progress-go" class="progress">
                             <div id="progress-loaded" class="progress-bar" role="progressbar"></div>
@@ -209,24 +208,39 @@
                                  role="progressbar"></div>
                         </div>
                     </div>
-                    <div class="text-time col-1 px-3">
+                    <div class="text-time col-2 col-md-1 px-0 ml-2">
                         <p id="total-time">
                             00:00
                         </p>
                     </div>
                 </div>
             </div>
-            <div class="col-3 col-xl-2 px-0">
-                <div class="container-fluid px-0 d-flex">
-                    <div class="col-2">
+            <div class="col-4 col-md-4 col-lg-3 col-xl-3 px-0">
+                <div class="container-fluid px-0 d-flex" style="height:3.5rem;">
+                    <div class="col-2 px-0 ml-4 ml-md-4 ml-xl-3 mr-0 mr-xl-2">
                         <p class="text-center">
                             <span id="control-volume" class="icomoon-volume-medium icon-control"></span>
                         </p>
                     </div>
-                    <div class="col-8">
-
+                    <div class="col-3 col-md-4 col-lg-6 px-0">
+                        <div id="volume-container" class="container-fluid px-0 d-flex">
+                            <div class="col-12 my-auto px-0">
+                                <div id="volume-indicator">
+                                    <span id="icon-volume-indicator"
+                                          class="icomoon-radio-checked2 icon-indicator"></span>
+                                </div>
+                                <div id="volume-go" class="progress">
+                                    <div id="volume-value" class="progress-bar" role="progressbar"></div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <div class="col-2">
+                    <div class="col-3 col-md-2 px-0 mx-0 mx-md-1 mx-lg-2">
+                        <p class="text-center">
+                            <span id="control-mode" class="icomoon-loop icon-control"></span>
+                        </p>
+                    </div>
+                    <div class="col-2 px-0">
                         <p class="text-center">
                             <span id="control-list" class="icomoon-menu4 icon-control"></span>
                         </p>
