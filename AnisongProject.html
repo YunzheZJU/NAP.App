@@ -15,7 +15,7 @@
 <nav id="navbar" class="nav-bg noto-sc py-0">
     <!--Positioned at top-->
     <div id="navbar-container" class="container d-flex text-f6 align-items-center">
-        <a id="navbar-brand" href="#" class="mr-2">AnisonG</a>
+        <a id="navbar-logo" href="#" class="mr-2">AnisonG</a>
         <ul id="navbar-list" class="d-flex">
             <li class="navbar-item active">
                 <a href="#">
@@ -48,7 +48,7 @@
         </div>
     </div>
 </nav>
-<body class="noto-sc">
+<body class="noto-sc" id="body">
 <div class="container bg-f6 minw-800">
     <div id="bg-image-container col-12">
         <div class="container">
@@ -69,10 +69,10 @@
         <img id="disc-needle" src="image/disc_needle.png"/>
     </div>
     <div class="col-6 ml-auto mt-5 pl-5 minh">
-        <div id="quality" class="px-1 unselactable">
+        <div id="quality" class="px-1 unselectable">
             <p>高质量</p>
         </div>
-        <div id="count" class="unselactable" data-toggle="tooltip" data-html="true" data-placement="left"
+        <div id="count" class="unselectable" data-toggle="tooltip" data-html="true" data-placement="left"
              title="播放数<br><hr>下载数">
             <div id="count-switch"></div>
             <p id="count-play">9</p>
@@ -181,7 +181,7 @@
                     </div>
                     <div class="col-4">
                         <p class="text-center">
-                            <span id="control-toggle" class="icomoon-play2 icon-control"></span>
+                            <span id="control-toggle" class="icomoon-play2 icon-control control-toggle-animated"></span>
                         </p>
                     </div>
                     <div class="col-4">
@@ -194,7 +194,7 @@
             <div class="col-5 col-md-6 col-lg-7 px-0">
                 <div class="container-fluid px-0 d-flex">
                     <div class="text-time col-2 col-md-1 px-0 mr-3">
-                        <p id="current-time">
+                        <p id="current-time" class="unselectable">
                             00:00
                         </p>
                     </div>
@@ -209,7 +209,7 @@
                         </div>
                     </div>
                     <div class="text-time col-2 col-md-1 px-0 ml-2">
-                        <p id="total-time">
+                        <p id="total-time" class="unselectable">
                             00:00
                         </p>
                     </div>

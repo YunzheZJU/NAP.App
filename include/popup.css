@@ -42,7 +42,8 @@
 }
 
 .popup_back {
-	cursor: pointer;
+	/*cursor: pointer;*/
+	cursor: default;
 	background-color: #222;
 }
 

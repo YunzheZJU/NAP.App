@@ -72,7 +72,7 @@ ul {
     height: 4rem;
 }
 
-#navbar-brand {
+#navbar-logo {
     font-size: 2rem;
     cursor: pointer;
 }
@@ -255,7 +255,7 @@ a:hover {
     cursor: pointer;
 }
 
-.unselactable {
+.unselectable {
     -webkit-user-select: none;
     -moz-user-select: none;
     -ms-user-select: none;
@@ -510,6 +510,32 @@ hr {
     margin: 0 !important;
 }
 
+@-webkit-keyframes text-shadow-keyframe {
+    from {
+        text-shadow: 0 0 10px #222222;
+    }
+    50% {
+        text-shadow: 0 0 3px #FFE2E2;
+    }
+    to {
+        text-shadow: 0 0 10px #222222;
+    }
+}
+
+@keyframes text-shadow-keyframe {
+    from {
+        text-shadow: 0 0 10px #222222;
+    }
+    to {
+        text-shadow: 0 0 10px #FFE2E2;
+    }
+}
+
+.control-toggle-animated {
+    -webkit-animation: text-shadow-keyframe 1.5s linear infinite alternate;
+    animation: text-shadow-keyframe 1.5s linear infinite alternate;
+}
+
 .icon-control {
     text-shadow: 0 0 10px #222222;
     color: #FFC7C7;
@@ -529,12 +555,14 @@ hr {
     font-size: 3rem;
 }
 
-#player-container .icomoon-play2 {
-    color: #e17b7b;
-}
-
 #control-toggle:hover {
     text-shadow: 0 0 3px #FFE2E2;
+    -webkit-animation: none;
+    animation: none;
+}
+
+#player-container .icomoon-play2 {
+    color: #e17b7b;
 }
 
 #control-next {
@@ -586,15 +614,18 @@ hr {
 
 #total-time {
     text-align: left;
+    transition: color .5s ease;
 }
 
 #progress-indicator {
     position: absolute;
     top: -6px;
     left: -7px;
+    width: 16px;
+    height: 16px;
     line-height: 0;
     z-index: 1;
-    transition: left .6s ease;
+    transition: left .1s ease;
 }
 
 .icon-indicator {
@@ -633,6 +664,7 @@ hr {
     background-color: #FFE2E2 !important;
     background-image: linear-gradient(-45deg, rgba(255, 255, 255, 0.65) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.65) 50%, rgba(255, 255, 255, 0.65) 75%, transparent 75%, transparent);
     background-size: 1rem 1rem;
+    transition: width .1s ease;
 }
 
 #control-volume {

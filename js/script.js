@@ -25,32 +25,29 @@ const $control_toggle = $('#control-toggle');
 const $control_next = $('#control-next');
 const $current_time = $('#current-time');
 const $total_time = $('#total-time');
+const $prograss_container = $('#progress-container');
+const $prograss_indicator = $('#progress-indicator');
 const $prograss_go = $('#progress-go');
 const $prograss_played = $('#progress-played');
 const $prograss_loaded = $('#progress-loaded');
-const $prograss_indicator = $('#progress-indicator');
 const $volume_go = $('#volume-go');
 const $volume_value = $('#volume-value');
 const $volume_indicator = $('#volume-indicator');
 const rotation_speed = 0.2;
-let $aplayer_ptime;
-let $aplayer_dtime;
-let $aplayer_loaded;
-let $aplayer_played;
-let ap;
-let musicInfo;
-let total_time;
-let listCount = 0;
-let isPlaying = false;
-let rotation = 0;
-let currentUrl = location['href'];
-let title;
-let description = $description[0].innerText;
-let descriptionToShow = description.substring(0, 60);
-let resizeFnBox = [];
-let resizeTimer = null;
-let needle_rotation_max = '-60deg';
-let popup_message = new $.Popup({
+const popup_time = new $.Popup({
+    backOpacity: 0,
+    speed: 500,
+    closeContent: '',
+    preloaderContent: '',
+    containerClass: "popup-message",
+    // afterOpen: function () {
+    //     let popup = this;
+    //     setTimeout(function () {
+    //         popup.close();
+    //     }, 5000);
+    // }
+});
+const popup_message = new $.Popup({
     backOpacity: 0,
     speed: 500,
     closeContent: '',
@@ -63,16 +60,39 @@ let popup_message = new $.Popup({
         }, 500);
     }
 });
-let clipboard = new Clipboard('#btn-share', {
+const clipboard = new Clipboard('#btn-share', {
     text: function () {
         return currentUrl;
     }
 });
+let newTime = null;
+let baseTime = null;
+let mouseDownX;
+let progressIndicatorLeft;
+let progressContainerWidth;
+let $aplayer_loaded;
+let $aplayer_played;
+let ap;
+let musicInfo;
+let totalTime;
+let listCount = 0;
+let isPlaying = false;
+let isdraggingProgressIndicator = false;
+let isdraggingVolumeIndicator = false;
+let rotation = 0;
+let currentUrl = location['href'];
+let title;
+let description = $description[0].innerText;
+let descriptionToShow = description.substring(0, 60);
+let resizeFnBox = [];
+let resizeTimer = null;
+let needle_rotation_max = '-60deg';
 
 window.onresize = function () {
     if (resizeTimer) {
         clearTimeout(resizeTimer);
     }
+    onWidthChange();
     resizeTimer = setTimeout(function () {
         for (let i = 0; i < resizeFnBox.length; i++) {
             resizeFnBox[i]();
@@ -81,6 +101,16 @@ window.onresize = function () {
 };
 
 function onWidthChange() {
+    // Store $progress_container's new width
+    progressContainerWidth = $prograss_container[0].clientWidth;
+    // Update the progress indicators
+    if (ap) {
+        const currentTime = ap.audio.currentTime;
+        const percentage = currentTime / totalTime;
+        const progress_width = $prograss_go[0].offsetWidth;
+        const progress_indicator_offset = ~~(progress_width * percentage - 7);
+        $prograss_indicator.css('left', progress_indicator_offset + 'px');
+    }
     // Update description length and move the disc
     if (window.innerWidth < 992) {
         descriptionToShow = description.substring(0, 30);
@@ -113,7 +143,7 @@ function onWidthChange() {
     }
 }
 
-resizeFnBox.push(onWidthChange);
+// resizeFnBox.push(onWidthChange);
 
 function collect() {
     $description[0].innerHTML = descriptionToShow + '...　<a id="spread" href="javascript:void(0);" class="spread link" onclick="spread();">展开</a>';
@@ -130,6 +160,7 @@ $(function () {
     $('[data-toggle="tooltip"]').tooltip()
 });
 
+// Set up player
 $(function () {
     $.get("http://api.anisong.niconi.cc/song/simple", {id: 1}, function (data) {
         let song = data[0];
@@ -144,7 +175,8 @@ $(function () {
             url: 'http://api.anisong.niconi.cc' + song['fileUrl'],
             pic: 'http://api.anisong.niconi.cc' + song['imageUrl']
         };
-    })
+        initiatePlayer(musicInfo);
+    });
 });
 
 function initiatePlayer(musicInfo) {
@@ -162,6 +194,7 @@ function initiatePlayer(musicInfo) {
     ap.on('play', function () {
         switchDisc();
         $control_toggle.removeClass('icomoon-play2');
+        $control_toggle.removeClass('control-toggle-animated');
         $control_toggle.addClass('icomoon-pause');
         console.log('play');
     });
@@ -169,40 +202,30 @@ function initiatePlayer(musicInfo) {
         switchDisc();
         $control_toggle.removeClass('icomoon-pause');
         $control_toggle.addClass('icomoon-play2');
+        $control_toggle.addClass('control-toggle-animated');
         console.log('pause');
     });
     ap.on('canplay', function () {
         console.log('canplay');
+        totalTime = ~~(ap.audio.duration);
+        $total_time[0].innerText = convertTimeFromNumber(totalTime);
     });
     ap.on('playing', function () {
-        if ($aplayer_ptime) {
-            // console.log(ap.audio.currentTime);
-            const text_current_time = $aplayer_ptime.innerText;
-            const text_total_time = $aplayer_dtime.innerText;
-            const current_time = convertTime(text_current_time);
-            total_time = convertTime(text_total_time);
-            const percentage = current_time / total_time;
-            const loaded = $aplayer_loaded.css('width');
-            const played = $aplayer_played.css('width');
-            const progress_width = $prograss_go[0].offsetWidth;
-            const indicator_offset = ~~(progress_width * percentage - 7);
-            // console.log($prograss_go[0].offsetWidth);
-            $prograss_loaded.css('width', loaded);
+        $aplayer_loaded = $('.aplayer-loaded');
+        $aplayer_played = $('.aplayer-played');
+        const currentTime = ap.audio.currentTime;
+        const percentage = currentTime / totalTime;
+        const loaded = $aplayer_loaded.css('width');    // TODO
+        const played = $aplayer_played.css('width');
+        const progress_width = $prograss_go[0].offsetWidth;
+        const progress_indicator_offset = ~~(progress_width * percentage - 7);
+        $prograss_loaded.css('width', loaded);
+        if (!isdraggingProgressIndicator) {
             $prograss_played.css('width', played);
-            $prograss_indicator.css('left', indicator_offset + 'px');
-            $current_time[0].innerText = text_current_time;
-            $total_time[0].innerText = $aplayer_dtime.innerText;
-        } else {
-            $aplayer_ptime = $('.aplayer-ptime')[0];
-            $aplayer_dtime = $('.aplayer-dtime')[0];
-            $aplayer_loaded = $('.aplayer-loaded');
-            $aplayer_played = $('.aplayer-played');
+            $prograss_indicator.css('left', progress_indicator_offset + 'px');
+            $total_time[0].innerText = convertTimeFromNumber(totalTime);
         }
-        const volume = ap.audio.volume;
-        const volume_width = $volume_go[0].offsetWidth;
-        const indicator_offset = ~~(volume * volume_width - 7);
-        $volume_value.css('width', volume * 100 + '%');
-        $volume_indicator.css('left', indicator_offset + 'px');
+        $current_time[0].innerText = convertTimeFromNumber(currentTime);
         console.log('playing');
     });
     ap.on('ended', function () {
@@ -211,11 +234,32 @@ function initiatePlayer(musicInfo) {
     ap.on('error', function () {
         console.log('error');
     });
+    // Set up volume controller
+    const volume_width = $volume_go[0].offsetWidth;
+    const volume_indicator_offset = ~~(0.8 * volume_width - 7);
+    $volume_value.css('width', 80 + '%');
+    $volume_indicator.css('left', volume_indicator_offset + 'px');
+    console.log('Initialization OK');
 }
 
-function convertTime(text_time) {
+function convertTimeFromText(text_time) {
     const time = text_time.split(':');
     return ~~time[0] * 60 + ~~time[1];
+}
+
+function convertTimeFromNumber(number_time) {
+    number_time = ~~number_time;
+    return addZeroPrefix(~~(number_time / 60)) + ":" + addZeroPrefix(number_time % 60);
+}
+
+function addZeroPrefix(numText) {
+    numText = numText.toString();
+    if (numText.length < 2) {
+        return '0' + numText;
+    }
+    else {
+        return numText;
+    }
 }
 
 function switchDisc() {
@@ -244,7 +288,9 @@ function initiateDisc() {
         if (!ap) {
             initiatePlayer(musicInfo);
         }
-        ap.play();
+        console.log('play(' + newTime + ')');
+        ap.play(newTime);
+        newTime = null;
     });
 }
 
@@ -281,7 +327,13 @@ $control_previous.click(function () {
 
 $control_toggle.click(function () {
     if (ap) {
-        ap.toggle();
+        if (isPlaying) {
+            ap.pause();
+        } else {
+            console.log('play(' + newTime + ')');
+            ap.play(newTime);
+            newTime = null;
+        }
     } else {
         initiatePlayer(musicInfo);
         ap.play();
@@ -372,4 +424,77 @@ $count.hover(function () {
     $count_switch.css('border-top-right-radius', '0.3rem');
     $count_switch.css('border-bottom-left-radius', '0');
     $count_switch.css('border-bottom-right-radius', '0');
+});
+
+$prograss_indicator.mousedown(function(event) {
+    console.log(event);
+    mouseDownX = event.clientX;
+    progressIndicatorLeft = ~~($prograss_indicator.css('left').split('px')[0]);
+    baseTime = newTime ? newTime : ap.audio.currentTime;
+    isdraggingProgressIndicator = true;
+});
+
+$(document).mouseup(function () {
+    if (isdraggingProgressIndicator) {
+        isdraggingProgressIndicator = false;
+        $current_time[0].innerText = convertTimeFromNumber(newTime);
+        if (ap && isPlaying) {
+            ap.play(newTime);
+            newTime = null;
+        }
+        $total_time.css('color', 'inherit');
+        popup_time.close();
+    }
+    if (isdraggingVolumeIndicator) {
+
+    }
+});
+
+$(document).mousemove(function (event) {
+    if (isdraggingProgressIndicator && event.x && ap) {
+        // Handle progress_played and progress_indicator
+        const mouseDeltaX = event.clientX - mouseDownX;
+        let newLeft = progressIndicatorLeft + mouseDeltaX;
+        if (newLeft < 0) {
+            newLeft = 0;
+        } else if (newLeft > progressContainerWidth) {
+            newLeft = progressContainerWidth;
+        }
+        const percentage = newLeft / progressContainerWidth;
+        newTime = percentage * totalTime;
+        const deltaTime = newTime - baseTime;
+        $prograss_indicator.css('left', newLeft - 7 + 'px');
+        $prograss_played.css('width', percentage * 100 + '%');
+        if (deltaTime > 0) {
+            $total_time.css('color', '#ed2525');
+        } else if (deltaTime < 0) {
+            $total_time.css('color', '#4de14d');
+        } else {
+            $total_time.css('color', 'inherit');
+        }
+        const newTimeText = convertTimeFromNumber(newTime);
+        const totalTimeText = convertTimeFromNumber(totalTime);
+        $total_time[0].innerText = newTimeText;
+        popup_time.open(
+            '<p class="popup-text"><span class="icomoon-notification icon-message"></span>' +
+            newTimeText + '/' + totalTimeText + '　' + (deltaTime >= 0 ? '+' : '') + ~~deltaTime + 's</p>',
+            'html'
+        );
+    }
+    if (isdraggingVolumeIndicator) {
+
+    }
+});
+
+$prograss_go.click(function (event) {
+    const percentage = event.offsetX / progressContainerWidth;
+    newTime = percentage * totalTime;
+    if (isPlaying) {
+        ap.play(newTime);
+        newTime = null;
+    } else {
+        $prograss_indicator.css('left', event.offsetX - 7 + 'px');
+        $prograss_played.css('width', percentage * 100 + '%');
+        $current_time[0].innerText = convertTimeFromNumber(newTime);
+    }
 });
