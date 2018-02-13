@@ -306,6 +306,16 @@ a:hover {
     transition: all .5s ease;
 }
 
+.count-on {
+    top:0;
+    border-radius: 0.3rem 0.3rem 0 0;
+}
+
+.count-off {
+    top:1.2rem;
+    border-radius: 0 0 0.3rem 0.3rem;
+}
+
 #count-play {
     line-height: 1.5rem;
 }
@@ -338,18 +348,20 @@ hr {
     cursor: default;
 }
 
+#info-board {
+    position: absolute;
+    -webkit-transform: rotateY(90deg);
+    transform: rotateY(90deg);
+}
+
 #info {
     clear: both;
     border-right: 2px solid #dddddd;
     cursor: default;
+    /*position: absolute;*/
 }
 
 #info-table {
-    /*-webkit-transform: rotateY(10deg);*/
-    /*-moz-transform: rotateY(10deg);*/
-    /*-ms-transform: rotateY(10deg);*/
-    /*-o-transform: rotateY(10deg);*/
-    /*transform: rotateY(70deg);*/
 }
 
 #info table {
@@ -406,6 +418,76 @@ hr {
     font-size: 1.2rem;
     line-height: 1.5rem;
     margin-top: -1.5rem;
+}
+
+#lyric-board {
+    height: 15rem;
+}
+
+#lyric {
+    position: absolute;
+    width:100%;
+    height: 10rem;
+    left:0;
+    text-align: center;
+    font-size: 1.1rem;
+}
+
+#lyric p {
+    margin-bottom: 0;
+}
+
+.lyric-jpn {
+    line-height: 1.5rem;
+    vertical-align: bottom;
+}
+
+.lyric-chs {
+    vertical-align: top;
+    line-height: 1.5rem;
+    margin-bottom: 0.5rem!important;
+}
+
+[data-line-number="1"] {
+    color: #bbbbbb;
+    background-image: -webkit-gradient(linear, 0 top, 0 bottom, from(#cccccc), to(#999999));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+[data-line-number="2"] {
+    color: #999999;
+    background-image: -webkit-gradient(linear, 0 top, 0 bottom, from(#999999), to(#444444));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+[data-line-number="3"] {
+    color: #000000;
+    background-image: -webkit-gradient(linear, 0 top, 0 bottom, from(#222222), to(#000000));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+[data-line-number="4"] {
+    color: #000000;
+    background-image: -webkit-gradient(linear, 0 top, 0 bottom, from(#000000), to(#222222));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+[data-line-number="5"] {
+    color: #999999;
+    background-image: -webkit-gradient(linear, 0 top, 0 bottom, from(#444444), to(#999999));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+[data-line-number="6"] {
+    color: #bbbbbb;
+    background-image: -webkit-gradient(linear, 0 top, 0 bottom, from(#999999), to(#cccccc));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
 }
 
 .btn-play {
@@ -536,7 +618,7 @@ hr {
     animation: text-shadow-keyframe 1.5s linear infinite alternate;
 }
 
-.icon-control {
+[id^="control-"] {
     text-shadow: 0 0 10px #222222;
     color: #FFC7C7;
     line-height: 3.5rem;
@@ -633,6 +715,11 @@ hr {
     position: absolute;
     text-shadow: 0 0 8px white;
     z-index: 2;
+    transition: text-shadow .2s ease;
+}
+
+.icon-indicator:hover {
+    text-shadow: 0 0 18px white;
 }
 
 #icon-indicator-bottom {
@@ -682,13 +769,15 @@ hr {
 }
 
 #volume-indicator {
-    height: 3.5rem;
+    /*height: 3.5rem;*/
     position: absolute;
     top: -6px;
     left: -8px;
+    width: 16px;
+    height: 16px;
     line-height: 0;
     z-index: 1;
-    transition: left .6s ease;
+    transition: left .1s ease;
 }
 
 #volume-go {
@@ -701,6 +790,7 @@ hr {
     height: 4px;
     position: absolute;
     background-color: #FFE2E2 !important;
+    transition: width .1s ease;
 }
 
 #control-mode {

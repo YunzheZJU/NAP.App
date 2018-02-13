@@ -23,6 +23,8 @@ const $count_switch = $('#count-switch');
 const $control_previous = $('#control-previous');
 const $control_toggle = $('#control-toggle');
 const $control_next = $('#control-next');
+const $control_volume = $('#control-volume');
+const $control_mode = $('#control-mode');
 const $current_time = $('#current-time');
 const $total_time = $('#total-time');
 const $prograss_container = $('#progress-container');
@@ -30,25 +32,18 @@ const $prograss_indicator = $('#progress-indicator');
 const $prograss_go = $('#progress-go');
 const $prograss_played = $('#progress-played');
 const $prograss_loaded = $('#progress-loaded');
+const $volume_container = $('#volume-container');
 const $volume_go = $('#volume-go');
 const $volume_value = $('#volume-value');
 const $volume_indicator = $('#volume-indicator');
 const rotation_speed = 0.2;
 const popup_time = new $.Popup({
-    backOpacity: 0,
     speed: 500,
     closeContent: '',
     preloaderContent: '',
-    containerClass: "popup-message",
-    // afterOpen: function () {
-    //     let popup = this;
-    //     setTimeout(function () {
-    //         popup.close();
-    //     }, 5000);
-    // }
+    containerClass: "popup-message"
 });
 const popup_message = new $.Popup({
-    backOpacity: 0,
     speed: 500,
     closeContent: '',
     preloaderContent: '',
@@ -70,13 +65,15 @@ let baseTime = null;
 let mouseDownX;
 let progressIndicatorLeft;
 let progressContainerWidth;
+let volumeIndicatorLeft;
+let volumeContainerWidth;
 let $aplayer_loaded;
 let $aplayer_played;
 let ap;
 let musicInfo;
 let totalTime;
 let listCount = 0;
-let isPlaying = false;
+// let isPlaying = false;
 let isdraggingProgressIndicator = false;
 let isdraggingVolumeIndicator = false;
 let rotation = 0;
@@ -103,13 +100,18 @@ window.onresize = function () {
 function onWidthChange() {
     // Store $progress_container's new width
     progressContainerWidth = $prograss_container[0].clientWidth;
-    // Update the progress indicators
+    volumeContainerWidth = $volume_container[0].clientWidth;
+    // Update progress and volume indicators
     if (ap) {
-        const currentTime = ap.audio.currentTime;
+        const currentTime = newTime ? newTime : ap.audio.currentTime;
         const percentage = currentTime / totalTime;
-        const progress_width = $prograss_go[0].offsetWidth;
-        const progress_indicator_offset = ~~(progress_width * percentage - 7);
-        $prograss_indicator.css('left', progress_indicator_offset + 'px');
+        const progressWidth = $prograss_go[0].offsetWidth;
+        const progressIndicatorOffset = ~~(progressWidth * percentage - 7);
+        $prograss_indicator.css('left', progressIndicatorOffset + 'px');
+        const currentVolume = ap.audio.volume;
+        const newLeft = currentVolume * volumeContainerWidth;
+        $volume_indicator.css('left', newLeft - 8 + 'px');
+        $volume_value.css('width', currentVolume * 100 + '%');
     }
     // Update description length and move the disc
     if (window.innerWidth < 992) {
@@ -138,12 +140,10 @@ function onWidthChange() {
     } else {
         collect();
     }
-    if (isPlaying) {
+    if (ap && !ap.audio.paused) {
         $disc_needle.css('transform', 'translate(-15.15%, -9.09%) scale(0.25) rotateZ(' + needle_rotation_max + ')');
     }
 }
-
-// resizeFnBox.push(onWidthChange);
 
 function collect() {
     $description[0].innerHTML = descriptionToShow + '...　<a id="spread" href="javascript:void(0);" class="spread link" onclick="spread();">展开</a>';
@@ -173,7 +173,8 @@ $(function () {
             title: song['title'],
             author: autherlist,
             url: 'http://api.anisong.niconi.cc' + song['fileUrl'],
-            pic: 'http://api.anisong.niconi.cc' + song['imageUrl']
+            pic: 'http://api.anisong.niconi.cc' + song['imageUrl'],
+            lrc: 'lyric/1.lrc'
         };
         initiatePlayer(musicInfo);
     });
@@ -184,7 +185,7 @@ function initiatePlayer(musicInfo) {
         element: document.getElementById('player'),
         narrow: false,
         autoplay: false,
-        showlrc: false,
+        showlrc: 3,
         mutex: true,
         theme: '#e6d0b2',
         preload: 'metadata',
@@ -215,8 +216,9 @@ function initiatePlayer(musicInfo) {
         $aplayer_played = $('.aplayer-played');
         const currentTime = ap.audio.currentTime;
         const percentage = currentTime / totalTime;
-        const loaded = $aplayer_loaded.css('width');    // TODO
-        const played = $aplayer_played.css('width');
+        // const loaded = $aplayer_loaded.css('width');    // TODO
+        const loaded = ap.audio.buffered.end(ap.audio.buffered.length - 1) / totalTime * 100 + '%';    // TODO
+        const played = percentage * 100 + '%';
         const progress_width = $prograss_go[0].offsetWidth;
         const progress_indicator_offset = ~~(progress_width * percentage - 7);
         $prograss_loaded.css('width', loaded);
@@ -263,10 +265,10 @@ function addZeroPrefix(numText) {
 }
 
 function switchDisc() {
-    if (isPlaying) {
+    if (ap.audio.paused) {
         initiateDisc();
     } else {
-        isPlaying = true;
+        // isPlaying = true;
         $disc_needle.css('transform', 'translate(-15.15%, -9.09%) scale(0.25) rotateZ(' + needle_rotation_max + ')');
         $disc_play.css('opacity', '0');
         $disc_play.css('cursor', 'default');
@@ -280,7 +282,7 @@ function switchDisc() {
 }
 
 function initiateDisc() {
-    isPlaying = false;
+    // isPlaying = false;
     $disc_needle.css('transform', 'translate(-15.15%, -9.09%) scale(0.25) rotateZ(-60deg)');
     $disc_play.css('opacity', '1');
     $disc_play.css('cursor', 'pointer');
@@ -297,7 +299,7 @@ function initiateDisc() {
 initiateDisc();
 
 function animate() {
-    if (isPlaying) {
+    if (ap && !ap.audio.paused) {
         rotation = rotation % 360;
         rotation += rotation_speed;
         $disc_cover.css('transform', 'scale(0.63) rotate(' + rotation + 'deg)');
@@ -327,7 +329,7 @@ $control_previous.click(function () {
 
 $control_toggle.click(function () {
     if (ap) {
-        if (isPlaying) {
+        if (!ap.audio.paused) {
             ap.pause();
         } else {
             console.log('play(' + newTime + ')');
@@ -412,22 +414,17 @@ clipboard.on('error', function (e) {
 
 $count.hover(function () {
     $count_play.css('line-height', '1.2rem');
-    $count_switch.css('top', '1.2rem');
-    $count_switch.css('border-top-left-radius', '0');
-    $count_switch.css('border-top-right-radius', '0');
-    $count_switch.css('border-bottom-left-radius', '0.3rem');
-    $count_switch.css('border-bottom-right-radius', '0.3rem');
+    // Switch off
+    $count_switch.removeClass();
+    $count_switch.addClass('count-off');
 }, function () {
     $count_play.css('line-height', '1.5rem');
-    $count_switch.css('top', '0');
-    $count_switch.css('border-top-left-radius', '0.3rem');
-    $count_switch.css('border-top-right-radius', '0.3rem');
-    $count_switch.css('border-bottom-left-radius', '0');
-    $count_switch.css('border-bottom-right-radius', '0');
+    // Switch on
+    $count_switch.removeClass();
+    $count_switch.addClass('count-on');
 });
 
 $prograss_indicator.mousedown(function(event) {
-    console.log(event);
     mouseDownX = event.clientX;
     progressIndicatorLeft = ~~($prograss_indicator.css('left').split('px')[0]);
     baseTime = newTime ? newTime : ap.audio.currentTime;
@@ -438,58 +435,80 @@ $(document).mouseup(function () {
     if (isdraggingProgressIndicator) {
         isdraggingProgressIndicator = false;
         $current_time[0].innerText = convertTimeFromNumber(newTime);
-        if (ap && isPlaying) {
+        if (ap && !ap.audio.paused) {
             ap.play(newTime);
             newTime = null;
         }
         $total_time.css('color', 'inherit');
         popup_time.close();
+        window.getSelection().removeAllRanges();
     }
     if (isdraggingVolumeIndicator) {
-
+        console.log('volume up');
+        isdraggingVolumeIndicator = false;
+        // console.log(window.getSelection());
+        window.getSelection().removeAllRanges();
     }
 });
 
 $(document).mousemove(function (event) {
-    if (isdraggingProgressIndicator && event.x && ap) {
-        // Handle progress_played and progress_indicator
-        const mouseDeltaX = event.clientX - mouseDownX;
-        let newLeft = progressIndicatorLeft + mouseDeltaX;
-        if (newLeft < 0) {
-            newLeft = 0;
-        } else if (newLeft > progressContainerWidth) {
-            newLeft = progressContainerWidth;
-        }
-        const percentage = newLeft / progressContainerWidth;
-        newTime = percentage * totalTime;
-        const deltaTime = newTime - baseTime;
-        $prograss_indicator.css('left', newLeft - 7 + 'px');
-        $prograss_played.css('width', percentage * 100 + '%');
-        if (deltaTime > 0) {
-            $total_time.css('color', '#ed2525');
-        } else if (deltaTime < 0) {
-            $total_time.css('color', '#4de14d');
-        } else {
-            $total_time.css('color', 'inherit');
-        }
-        const newTimeText = convertTimeFromNumber(newTime);
-        const totalTimeText = convertTimeFromNumber(totalTime);
-        $total_time[0].innerText = newTimeText;
-        popup_time.open(
-            '<p class="popup-text"><span class="icomoon-notification icon-message"></span>' +
-            newTimeText + '/' + totalTimeText + '　' + (deltaTime >= 0 ? '+' : '') + ~~deltaTime + 's</p>',
-            'html'
-        );
+    if (isdraggingProgressIndicator && ap) {
+        onDraggingProgressIndicator(event);
     }
-    if (isdraggingVolumeIndicator) {
-
+    if (isdraggingVolumeIndicator && ap) {
+        onDraggingVolumeIndicator(event);
     }
 });
+
+function onDraggingProgressIndicator(event) {
+    const mouseDeltaX = event.clientX - mouseDownX;
+    let newLeft = progressIndicatorLeft + mouseDeltaX;
+    if (newLeft < 0) {
+        newLeft = 0;
+    } else if (newLeft > progressContainerWidth) {
+        newLeft = progressContainerWidth;
+    }
+    const percentage = newLeft / progressContainerWidth;
+    newTime = percentage * totalTime;
+    const deltaTime = newTime - baseTime;
+    $prograss_indicator.css('left', newLeft - 7 + 'px');
+    $prograss_played.css('width', percentage * 100 + '%');
+    if (deltaTime > 0) {
+        $total_time.css('color', '#ed2525');
+    } else if (deltaTime < 0) {
+        $total_time.css('color', '#4de14d');
+    } else {
+        $total_time.css('color', 'inherit');
+    }
+    const newTimeText = convertTimeFromNumber(newTime);
+    const totalTimeText = convertTimeFromNumber(totalTime);
+    $total_time[0].innerText = newTimeText;
+    popup_time.open(
+        '<p class="popup-text"><span class="icomoon-notification icon-message"></span>' +
+        newTimeText + '/' + totalTimeText + '　' + (deltaTime >= 0 ? '+' : '') + ~~deltaTime + 's</p>',
+        'html'
+    );
+}
+
+function onDraggingVolumeIndicator(event) {
+    const mouseDeltaX = event.clientX - mouseDownX;
+    let newLeft = volumeIndicatorLeft + mouseDeltaX;
+    if (newLeft < 0) {
+        newLeft = 0;
+    } else if (newLeft > volumeContainerWidth) {
+        newLeft = volumeContainerWidth;
+    }
+    const percentage = newLeft / volumeContainerWidth;
+    ap.volume(percentage);
+    $volume_indicator.css('left', newLeft - 8 + 'px');
+    $volume_value.css('width', percentage * 100 + '%');
+    switchVolumeIcon(percentage);
+}
 
 $prograss_go.click(function (event) {
     const percentage = event.offsetX / progressContainerWidth;
     newTime = percentage * totalTime;
-    if (isPlaying) {
+    if (!ap.audio.paused) {
         ap.play(newTime);
         newTime = null;
     } else {
@@ -498,3 +517,77 @@ $prograss_go.click(function (event) {
         $current_time[0].innerText = convertTimeFromNumber(newTime);
     }
 });
+
+$volume_indicator.mousedown(function(event) {
+    mouseDownX = event.clientX;
+    volumeIndicatorLeft = ~~($volume_indicator.css('left').split('px')[0]);
+    isdraggingVolumeIndicator = true;
+});
+
+$volume_go.click(function (event) {
+    const percentage = event.offsetX / volumeContainerWidth;
+    ap.volume(percentage);
+    $volume_indicator.css('left', event.offsetX - 8 + 'px');
+    $volume_value.css('width', percentage * 100 + '%');
+    switchVolumeIcon(percentage);
+});
+
+function switchVolumeIcon(volume) {
+    let iconClass;
+    if (volume === 0) {
+        iconClass = 'icomoon-volume-mute2';
+    } else if (volume < 0.33) {
+        iconClass = 'icomoon-volume-low';
+    } else if (volume < 0.66) {
+        iconClass = 'icomoon-volume-medium';
+    } else {
+        iconClass = 'icomoon-volume-high';
+    }
+    $control_volume.removeClass();
+    $control_volume.addClass(iconClass);
+}
+
+$control_volume.click(function () {
+    // Mute
+    ap.volume(0);
+    $volume_indicator.css('left', '-8px');
+    $volume_value.css('width', '0');
+    switchVolumeIcon(0);
+});
+
+$control_mode.click(function () {
+    let currentMode = ~~$control_mode.attr('data-mode');
+    currentMode = currentMode === 3 ? 0 : (currentMode + 1);
+    $control_mode.attr('data-mode', currentMode);
+    switchModeIcon(currentMode);
+});
+
+function switchModeIcon(mode) {
+    let iconClass = '';
+    switch (mode) {
+        case 0:
+            // Random
+            ap.mode = 'random';
+            iconClass = 'icomoon-shuffle';
+            break;
+        case 1:
+            // Single
+            ap.mode = 'single';
+            iconClass = 'icomoon-infinite';
+            break;
+        case 2:
+            // Circulation (Loop)
+            ap.mode = 'circulation';
+            iconClass = 'icomoon-loop';
+            break;
+        case 3:
+            // Order
+            ap.mode = 'order';
+            iconClass = 'icomoon-arrow-right2';
+            break;
+        default:
+            console.log('Unrecongnized mode!');
+    }
+    $control_mode.removeClass();
+    $control_mode.addClass(iconClass);
+}
