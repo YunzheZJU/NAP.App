@@ -20,6 +20,12 @@ const $description = $('#description');
 const $count = $('#count');
 const $count_play = $('#count-play');
 const $count_switch = $('#count-switch');
+const $info_board = $('#info-board');
+const $lyric_board = $('#lyric-board');
+const $lyric_board_chs = $('#lyric-board-chs');
+const $lyric_content = $('#lyric-content');
+const $lyric_content_chs = $('#lyric-content-chs');
+const $control_board = $('#control-board');
 const $control_previous = $('#control-previous');
 const $control_toggle = $('#control-toggle');
 const $control_next = $('#control-next');
@@ -67,16 +73,16 @@ let progressIndicatorLeft;
 let progressContainerWidth;
 let volumeIndicatorLeft;
 let volumeContainerWidth;
-let $aplayer_loaded;
-let $aplayer_played;
 let ap;
+let lrc;
+let lrcContent;
 let musicInfo;
 let totalTime;
 let listCount = 0;
-// let isPlaying = false;
 let isdraggingProgressIndicator = false;
 let isdraggingVolumeIndicator = false;
 let rotation = 0;
+let boardState = 0;
 let currentUrl = location['href'];
 let title;
 let description = $description[0].innerText;
@@ -212,12 +218,9 @@ function initiatePlayer(musicInfo) {
         $total_time[0].innerText = convertTimeFromNumber(totalTime);
     });
     ap.on('playing', function () {
-        $aplayer_loaded = $('.aplayer-loaded');
-        $aplayer_played = $('.aplayer-played');
         const currentTime = ap.audio.currentTime;
         const percentage = currentTime / totalTime;
-        // const loaded = $aplayer_loaded.css('width');    // TODO
-        const loaded = ap.audio.buffered.end(ap.audio.buffered.length - 1) / totalTime * 100 + '%';    // TODO
+        const loaded = ap.audio.buffered.end(ap.audio.buffered.length - 1) / totalTime * 100 + '%';
         const played = percentage * 100 + '%';
         const progress_width = $prograss_go[0].offsetWidth;
         const progress_indicator_offset = ~~(progress_width * percentage - 7);
@@ -226,9 +229,10 @@ function initiatePlayer(musicInfo) {
             $prograss_played.css('width', played);
             $prograss_indicator.css('left', progress_indicator_offset + 'px');
             $total_time[0].innerText = convertTimeFromNumber(totalTime);
+            // Update lyric
+            updateLyric(currentTime);
         }
         $current_time[0].innerText = convertTimeFromNumber(currentTime);
-        console.log('playing');
     });
     ap.on('ended', function () {
         console.log('ended');
@@ -268,7 +272,6 @@ function switchDisc() {
     if (ap.audio.paused) {
         initiateDisc();
     } else {
-        // isPlaying = true;
         $disc_needle.css('transform', 'translate(-15.15%, -9.09%) scale(0.25) rotateZ(' + needle_rotation_max + ')');
         $disc_play.css('opacity', '0');
         $disc_play.css('cursor', 'default');
@@ -282,7 +285,6 @@ function switchDisc() {
 }
 
 function initiateDisc() {
-    // isPlaying = false;
     $disc_needle.css('transform', 'translate(-15.15%, -9.09%) scale(0.25) rotateZ(-60deg)');
     $disc_play.css('opacity', '1');
     $disc_play.css('cursor', 'pointer');
@@ -297,6 +299,25 @@ function initiateDisc() {
 }
 
 initiateDisc();
+
+function updateLyric(currentTime) {
+    if (lrc) {
+        let index = lrc.select(currentTime);
+        if (index >= 0) {
+            // Transform
+            $lyric_content.css('top', 4 - 2 * index + 'rem');
+            $lyric_content.css('background-image', '-webkit-gradient(linear, 0 top, 0 bottom, ' +
+                'color-stop(' + (index - 1.5) / lrcContent.length + ', #bbbbbb), ' +
+                'color-stop(' + (index + 0.5) / lrcContent.length + ', #000000), ' +
+                'color-stop(' + (index + 2.5) / lrcContent.length + ', #bbbbbb))');
+            $lyric_content_chs.css('top', 3.5 - 3.5 * index + 'rem');
+            $lyric_content_chs.css('background-image', '-webkit-gradient(linear, 0 top, 0 bottom, ' +
+                'color-stop(' + (index - 0.5) / lrcContent.length + ', #bbbbbb), ' +
+                'color-stop(' + (index + 0.5) / lrcContent.length + ', #000000), ' +
+                'color-stop(' + (index + 1.5) / lrcContent.length + ', #bbbbbb))');
+        }
+    }
+}
 
 function animate() {
     if (ap && !ap.audio.paused) {
@@ -424,7 +445,7 @@ $count.hover(function () {
     $count_switch.addClass('count-on');
 });
 
-$prograss_indicator.mousedown(function(event) {
+$prograss_indicator.mousedown(function (event) {
     mouseDownX = event.clientX;
     progressIndicatorLeft = ~~($prograss_indicator.css('left').split('px')[0]);
     baseTime = newTime ? newTime : ap.audio.currentTime;
@@ -444,7 +465,6 @@ $(document).mouseup(function () {
         window.getSelection().removeAllRanges();
     }
     if (isdraggingVolumeIndicator) {
-        console.log('volume up');
         isdraggingVolumeIndicator = false;
         // console.log(window.getSelection());
         window.getSelection().removeAllRanges();
@@ -488,6 +508,7 @@ function onDraggingProgressIndicator(event) {
         newTimeText + '/' + totalTimeText + '　' + (deltaTime >= 0 ? '+' : '') + ~~deltaTime + 's</p>',
         'html'
     );
+    updateLyric(newTime);
 }
 
 function onDraggingVolumeIndicator(event) {
@@ -518,7 +539,7 @@ $prograss_go.click(function (event) {
     }
 });
 
-$volume_indicator.mousedown(function(event) {
+$volume_indicator.mousedown(function (event) {
     mouseDownX = event.clientX;
     volumeIndicatorLeft = ~~($volume_indicator.css('left').split('px')[0]);
     isdraggingVolumeIndicator = true;
@@ -591,3 +612,64 @@ function switchModeIcon(mode) {
     $control_mode.removeClass();
     $control_mode.addClass(iconClass);
 }
+
+$.get('lyric/1.lrc', function (data) {
+    lrc = new Lyrics(data);
+    lrcContent = lrc.getLyrics();
+    $('.lyric-not-exist').remove();
+    for (let i = 0; i < lrcContent.length; i++) {
+        const lyricText = lrc.getLyric(i).text;
+        const node = $('<p class="lyric-jpn"></p>').text(lyricText.length ? lyricText : '　');
+        lrcContent[i].node = node;
+        $lyric_content.append(node);
+    }
+    $.get('lyric/1_chs.lrc', function (data) {
+        const lrcChs = new Lyrics(data);
+        const lrcContentChs = lrcChs.getLyrics().length;
+        for(let i = 0; i < lrcContentChs; i++) {
+            const lyricTextChs = lrcChs.getLyric(i).text;
+            lrcContent[i].nodeChs = $('<p class="lyric-chs"></p>').text(lyricTextChs.length ? lyricTextChs : '　');
+            $lyric_content_chs.append(lrcContent[i].node.clone(), lrcContent[i].nodeChs);
+        }
+    })
+});
+
+$control_board.click(function () {
+    boardState = boardState === 2 ? 0 : (boardState + 1);
+    switch (boardState) {
+        case 0:
+            $info_board.css('-webkit-transform', 'rotateY(0deg)');
+            $info_board.css('transform', 'rotateY(0deg)');
+            $lyric_board.css('-webkit-transform', 'rotateY(90deg)');
+            $lyric_board.css('transform', 'rotateY(90deg)');
+            $lyric_board_chs.css('-webkit-transform', 'rotateY(180deg)');
+            $lyric_board_chs.css('transform', 'rotateY(180deg)');
+            // Change icon
+            $control_board.removeClass();
+            $control_board.addClass('icomoon-linkedin');
+            break;
+        case 1:
+            $info_board.css('-webkit-transform', 'rotateY(-90deg)');
+            $info_board.css('transform', 'rotateY(-90deg)');
+            $lyric_board.css('-webkit-transform', 'rotateY(0deg)');
+            $lyric_board.css('transform', 'rotateY(0deg)');
+            $lyric_board_chs.css('-webkit-transform', 'rotateY(90deg)');
+            $lyric_board_chs.css('transform', 'rotateY(90deg)');
+            $control_board.removeClass();
+            $control_board.addClass('icomoon-lanyrd');
+            break;
+        case 2:
+            $info_board.css('-webkit-transform', 'rotateY(-180deg)');
+            $info_board.css('transform', 'rotateY(-180deg)');
+            $lyric_board.css('-webkit-transform', 'rotateY(-90deg)');
+            $lyric_board.css('transform', 'rotateY(-90deg)');
+            $lyric_board_chs.css('-webkit-transform', 'rotateY(0deg)');
+            $lyric_board_chs.css('transform', 'rotateY(0deg)');
+            $control_board.removeClass();
+            $control_board.addClass('icomoon-trello');
+            break;
+        default:
+            console.log('Unrecognized state.');
+            break;
+    }
+});

@@ -24,32 +24,8 @@
     -moz-osx-font-smoothing: grayscale;
 }
 
-.icomoon-spinner3:before {
-    content: "\e97c";
-}
-
-.icomoon-spinner11:before {
-    content: "\e984";
-}
-
 .icomoon-menu4:before {
     content: "\e9c0";
-}
-
-.icomoon-notification:before {
-    content: "\ea08";
-}
-
-.icomoon-question:before {
-    content: "\ea09";
-}
-
-.icomoon-info:before {
-    content: "\ea0c";
-}
-
-.icomoon-cancel-circle:before {
-    content: "\ea0d";
 }
 
 .icomoon-play2:before {
@@ -80,8 +56,8 @@
     content: "\ea28";
 }
 
-.icomoon-volume-mute:before {
-    content: "\ea29";
+.icomoon-volume-mute2:before {
+    content: "\ea2a";
 }
 
 .icomoon-loop:before {
@@ -100,10 +76,19 @@
     content: "\ea3c";
 }
 
-.icomoon-radio-checked:before {
-    content: "\ea54";
-}
-
 .icomoon-radio-checked2:before {
     content: "\ea55";
 }
+
+.icomoon-lanyrd:before {
+    content: "\eaa2";
+}
+
+.icomoon-trello:before {
+    content: "\eab3";
+}
+
+.icomoon-linkedin:before {
+    content: "\eac9";
+}
+

@@ -49,7 +49,7 @@
     </div>
 </nav>
 <body class="noto-sc" id="body">
-<div class="container bg-f6 minw-800">
+<div id="page-container" class="container">
     <div id="bg-image-container col-12">
         <div class="container">
             <div class="col-12">
@@ -88,7 +88,7 @@
             新潮社のWEBコミックサイト『くらげバンチ』にて連載の人気コミック『少女終末旅行』がTVアニメ化。終末の世界を旅する少女2人、水瀬いのり演じるチトと、久保ユリカ演じるユーリの人気声優による、オープニング・テーマがリリース!
         </div>
         <div class="container mt-1 mt-lg-2 mt-xl-3 mx-xl-5 mx-lg-2">
-            <div class="row">
+            <div class="row unselectable">
                 <div id="btn-play"
                      class="col-auto btn-action btn-special btn-play ml-0 ml-lg-1 ml-xl-2 my-1 px-2 py-1">
                     <span class="oi oi-play-circle"></span> 播放
@@ -170,32 +170,27 @@
                 <a href="#" class="">R</a>
             </div>
         </div>
-        <div id="lyric-board" class="mt-5">
-            <div id="lyric">
-                <p class="lyric-jpn" data-line-number="1">
-                    今日はもう引き返そうかな
-                </p>
-                <p class="lyric-chs" data-line-number="2">
-                    今天就先返回吧
-                </p>
-                <p class="lyric-jpn" data-line-number="3">
-                    明日は もっといけるかな
-                </p>
-                <p class="lyric-chs" data-line-number="4">
-                    明天还能走得更远吧
-                </p>
-                <p class="lyric-jpn" data-line-number="5">
-                    kick she mood (軋む)
-                </p>
-                <p class="lyric-chs" data-line-number="6">
-                    kick she mood (车轮滚滚)
-                </p>
+        <div id="lyric-board" class="mt-4">
+            <div id="lyric-container">
+                <div id="lyric-content">
+                    <p class="lyric-not-exist mt-5">没有歌词~</p>
+                </div>
             </div>
+        </div>
+        <div id="lyric-board-chs" class="mt-4">
+            <div id="lyric-container-chs">
+                <div id="lyric-content-chs">
+                    <p class="lyric-not-exist mt-5">没有歌词~</p>
+                </div>
+            </div>
+        </div>
+        <div>
+            <span id="control-board" class="icomoon-linkedin"></span>
         </div>
     </div>
 </div>
-<div id="player" class="aplayer mx-auto"></div>
-<div id="player-container" class="container-fluid no-gutters px-0" style="display: none">
+<div id="player" class="aplayer mx-auto" style="display: none"></div>
+<div id="player-container" class="container-fluid no-gutters px-0">
     <div id="player-bg"></div>
     <!--Fixed at bottom-->
     <div class="col-12 col-lg-11 col-xl-10 mx-auto">
@@ -204,17 +199,17 @@
                 <div class="container-fluid no-gutters d-flex px-0">
                     <div class="col-4">
                         <p class="text-center">
-                            <span id="control-previous" class="icomoon-previous icon-control"></span>
+                            <span id="control-previous" class="icomoon-previous"></span>
                         </p>
                     </div>
                     <div class="col-4">
                         <p class="text-center">
-                            <span id="control-toggle" class="icomoon-play2 icon-control control-toggle-animated"></span>
+                            <span id="control-toggle" class="icomoon-play2  control-toggle-animated"></span>
                         </p>
                     </div>
                     <div class="col-4">
                         <p class="text-center">
-                            <span id="control-next" class="icomoon-next icon-control"></span>
+                            <span id="control-next" class="icomoon-next"></span>
                         </p>
                     </div>
                 </div>
@@ -247,7 +242,7 @@
                 <div class="container-fluid px-0 d-flex" style="height:3.5rem;">
                     <div class="col-2 px-0 ml-4 ml-md-4 ml-lg-3 ml-xl-3 mr-0 mr-lg-1 mr-xl-2">
                         <p class="text-center">
-                            <span id="control-volume" class="icomoon-volume-medium icon-control"></span>
+                            <span id="control-volume" class="icomoon-volume-medium"></span>
                         </p>
                     </div>
                     <div class="col-3 col-md-4 col-lg-6 ml-2 ml-lg-0 px-0">
@@ -265,12 +260,12 @@
                     </div>
                     <div class="col-3 col-md-2 px-0 mx-0 mx-md-1 mx-lg-2">
                         <p class="text-center">
-                            <span id="control-mode" class="icomoon-loop icon-control" data-mode="2"></span>
+                            <span id="control-mode" class="icomoon-loop" data-mode="2"></span>
                         </p>
                     </div>
                     <div class="col-2 px-0">
                         <p class="text-center">
-                            <span id="control-list" class="icomoon-menu4 icon-control"></span>
+                            <span id="control-list" class="icomoon-menu4"></span>
                         </p>
                     </div>
                 </div>
@@ -284,6 +279,7 @@
 <script type="text/javascript" src="include/bootstrap.js"></script>
 <script type="text/javascript" src="include/APlayer.min.js"></script>
 <script type="text/javascript" src="include/clipboard.js"></script>
+<script type="text/javascript" src="include/lyrics.js"></script>
 <script type="text/javascript" src="js/script.js"></script>
 </body>
 </html>
