@@ -24,6 +24,10 @@
     -moz-osx-font-smoothing: grayscale;
 }
 
+.icomoon-bin:before {
+    content: "\e9ac";
+}
+
 .icomoon-menu4:before {
     content: "\e9c0";
 }

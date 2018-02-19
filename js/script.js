@@ -182,7 +182,8 @@ $(function () {
             pic: 'http://api.anisong.niconi.cc' + song['imageUrl'],
             lrc: 'lyric/1.lrc'
         };
-        initiatePlayer(musicInfo);
+        // $control_toggle.click();
+        localStorage.clear();
     });
 });
 
@@ -200,6 +201,7 @@ function initiatePlayer(musicInfo) {
     });
     ap.on('play', function () {
         switchDisc();
+        addToPlaylist();
         $control_toggle.removeClass('icomoon-play2');
         $control_toggle.removeClass('control-toggle-animated');
         $control_toggle.addClass('icomoon-pause');
@@ -213,6 +215,7 @@ function initiatePlayer(musicInfo) {
         console.log('pause');
     });
     ap.on('canplay', function () {
+        // Toggled when switch time or switch song
         console.log('canplay');
         totalTime = ~~(ap.audio.duration);
         $total_time[0].innerText = convertTimeFromNumber(totalTime);
@@ -386,7 +389,6 @@ $btn_play.click(function () {
     } else {
         initiatePlayer(musicInfo);
     }
-    listCount++;
     ap.setMusic(listCount - 1);
     ap.play();
 });
@@ -397,7 +399,7 @@ $btn_add.click(function () {
     } else {
         initiatePlayer(musicInfo);
     }
-    listCount++;
+    addToPlaylist();
     popup_message.open(
         '<p class="popup-text"><span class="icomoon-notification icon-message"></span>已添加到播放列表>_<</p>',
         'html'
@@ -673,3 +675,19 @@ $control_board.click(function () {
             break;
     }
 });
+
+function addToPlaylist() {
+    listCount++;
+    let list = localStorage.getItem('list');
+    const item = {id: '1', name: '123', artist: 'ABC', duration: totalTime};
+    if (!list) {
+        list = [item];
+        console.log(list);
+    } else {
+        list = JSON.parse(list);
+        list.push(item);
+    }
+    localStorage.setItem('list', JSON.stringify(list));
+    console.log('Playlist is updated to' + list);
+    // TODO: Update UI
+}
