@@ -3,6 +3,9 @@
  */
 
 'use strict';
+const $title = $('#title');
+const $album = $('#album');
+const $artist = $('#artist');
 const $disc_group = $('#disc-group');
 const $disc_cover = $('#disc-cover');
 const $disc_mask = $('#disc-mask');
@@ -26,13 +29,17 @@ const $lyric_board_chs = $('#lyric-board-chs');
 const $lyric_content = $('#lyric-content');
 const $lyric_content_chs = $('#lyric-content-chs');
 const $control_board = $('#control-board');
+const $player_container = $('#player-container');
 const $control_previous = $('#control-previous');
 const $control_toggle = $('#control-toggle');
 const $control_next = $('#control-next');
 const $control_volume = $('#control-volume');
 const $control_mode = $('#control-mode');
+const $control_list = $('#control-list');
 const $current_time = $('#current-time');
 const $total_time = $('#total-time');
+const $progress_playlist = $('#progress-playlist');
+const $progress_box = $('#progress-box');
 const $prograss_container = $('#progress-container');
 const $prograss_indicator = $('#progress-indicator');
 const $prograss_go = $('#progress-go');
@@ -42,6 +49,9 @@ const $volume_container = $('#volume-container');
 const $volume_go = $('#volume-go');
 const $volume_value = $('#volume-value');
 const $volume_indicator = $('#volume-indicator');
+const $playlist_box = $('#playlist-box');
+const $playlist_list = $('#playlist-list');
+const $playlist_not_exist = $('#playlist-not-exist');
 const rotation_speed = 0.2;
 const popup_time = new $.Popup({
     speed: 500,
@@ -66,6 +76,8 @@ const clipboard = new Clipboard('#btn-share', {
         return currentUrl;
     }
 });
+let currentId = 7;
+let artistsHtml = [];
 let newTime = null;
 let baseTime = null;
 let mouseDownX;
@@ -81,6 +93,8 @@ let totalTime;
 let listCount = 0;
 let isdraggingProgressIndicator = false;
 let isdraggingVolumeIndicator = false;
+let isFirstPlay = true;
+let showList = false;
 let rotation = 0;
 let boardState = 0;
 let currentUrl = location['href'];
@@ -168,20 +182,30 @@ $(function () {
 
 // Set up player
 $(function () {
-    $.get("http://api.anisong.niconi.cc/song/simple", {id: 1}, function (data) {
+    $.get("http://api.anisong.niconi.cc/song/simple", {id: currentId}, function (data) {
+        console.log(data);
         let song = data[0];
         let tempArray = [];
+        artistsHtml = [];
         song['simpleArtistInfos'].forEach(function (element) {
             tempArray.push(element['name']);
+            artistsHtml.push('<a href="#">' + element['name'] + '</a>')
         });
         const autherlist = tempArray.join('/');
+        artistsHtml = artistsHtml.join('/');
         musicInfo = {
+            id: currentId,
             title: song['title'],
             author: autherlist,
+            album: song['simpleAlbumInfo'].title,
             url: 'http://api.anisong.niconi.cc' + song['fileUrl'],
             pic: 'http://api.anisong.niconi.cc' + song['imageUrl'],
             lrc: 'lyric/1.lrc'
         };
+        $disc_cover.attr('src', musicInfo.pic);
+        $title.text(musicInfo.title);
+        $album.text(musicInfo.album);
+        $artist.html(artistsHtml);
         // $control_toggle.click();
         localStorage.clear();
     });
@@ -201,7 +225,6 @@ function initiatePlayer(musicInfo) {
     });
     ap.on('play', function () {
         switchDisc();
-        addToPlaylist();
         $control_toggle.removeClass('icomoon-play2');
         $control_toggle.removeClass('control-toggle-animated');
         $control_toggle.addClass('icomoon-pause');
@@ -217,8 +240,16 @@ function initiatePlayer(musicInfo) {
     ap.on('canplay', function () {
         // Toggled when switch time or switch song
         console.log('canplay');
+        // Get total time of this song
         totalTime = ~~(ap.audio.duration);
+        console.log(ap.audio);
+        console.log(ap.audio.readyState);
         $total_time[0].innerText = convertTimeFromNumber(totalTime);
+        // If first play, add to playlist
+        if (isFirstPlay) {
+            addToPlaylist();
+            isFirstPlay = false;
+        }
     });
     ap.on('playing', function () {
         const currentTime = ap.audio.currentTime;
@@ -257,6 +288,9 @@ function convertTimeFromText(text_time) {
 }
 
 function convertTimeFromNumber(number_time) {
+    if (!number_time) {
+        return '00:00';
+    }
     number_time = ~~number_time;
     return addZeroPrefix(~~(number_time / 60)) + ":" + addZeroPrefix(number_time % 60);
 }
@@ -396,10 +430,17 @@ $btn_play.click(function () {
 $btn_add.click(function () {
     if (ap) {
         ap.addMusic([musicInfo]);
+        addToPlaylist();
     } else {
         initiatePlayer(musicInfo);
     }
-    addToPlaylist();
+    if (showList) {
+        if (listCount) {
+            $player_container.css('height', (1.5 + listCount * 2.25) + 'rem');
+        }
+    } else {
+        $control_list.click();
+    }
     popup_message.open(
         '<p class="popup-text"><span class="icomoon-notification icon-message"></span>已添加到播放列表>_<</p>',
         'html'
@@ -615,6 +656,24 @@ function switchModeIcon(mode) {
     $control_mode.addClass(iconClass);
 }
 
+$control_list.click(function () {
+    if (showList) {
+        $progress_playlist.css('top', '0');
+        $progress_box.css('opacity', '1');
+        $playlist_box.css('opacity', '0');
+        $player_container.css('height', '3.5rem');
+        showList = false;
+    } else {
+        $progress_playlist.css('top', '-3.5rem');
+        $progress_box.css('opacity', '0');
+        $playlist_box.css('opacity', '1');
+        if (listCount) {
+            $player_container.css('height', (1.5 + listCount * 2.25) + 'rem');
+        }
+        showList = true;
+    }
+});
+
 $.get('lyric/1.lrc', function (data) {
     lrc = new Lyrics(data);
     lrcContent = lrc.getLyrics();
@@ -628,7 +687,7 @@ $.get('lyric/1.lrc', function (data) {
     $.get('lyric/1_chs.lrc', function (data) {
         const lrcChs = new Lyrics(data);
         const lrcContentChs = lrcChs.getLyrics().length;
-        for(let i = 0; i < lrcContentChs; i++) {
+        for (let i = 0; i < lrcContentChs; i++) {
             const lyricTextChs = lrcChs.getLyric(i).text;
             lrcContent[i].nodeChs = $('<p class="lyric-chs"></p>').text(lyricTextChs.length ? lyricTextChs : '　');
             $lyric_content_chs.append(lrcContent[i].node.clone(), lrcContent[i].nodeChs);
@@ -677,17 +736,37 @@ $control_board.click(function () {
 });
 
 function addToPlaylist() {
+    if (listCount === 0) {
+        $playlist_not_exist.remove();
+    }
     listCount++;
     let list = localStorage.getItem('list');
-    const item = {id: '1', name: '123', artist: 'ABC', duration: totalTime};
+    const item = {
+        id: musicInfo.id,
+        name: musicInfo.title,
+        artist: artistsHtml,
+        duration: convertTimeFromNumber(totalTime)
+    };
     if (!list) {
-        list = [item];
-        console.log(list);
+        list = [];
     } else {
         list = JSON.parse(list);
-        list.push(item);
     }
+    console.log('Playlist previous' + JSON.stringify(list));
+    list.push(item);
     localStorage.setItem('list', JSON.stringify(list));
-    console.log('Playlist is updated to' + list);
-    // TODO: Update UI
+    console.log('Playlist is updated to' + JSON.stringify(list));
+    // Update UI
+    let html = '<li class="container-fluid playlist-item py-1" data-id="' + item.id + '">' +
+        '<div class="row unselectable">' +
+        '<div class="col-4 col-md-5 col-lg-7 playlist-title"><a href="#">' + item.name + '</a></div>' +
+        '<div class="col-4 col-md-4 col-lg-3 playlist-artist">' + item.artist + '</div>' +
+        '<div class="col-4 col-md-3 col-lg-2 playlist-duration">' + item.duration + '</div>' +
+        '</div>' +
+        '</li>';
+    $playlist_list.append(function () {
+        return html;
+    });
 }
+
+// TODO: Active playlist item

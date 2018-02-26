@@ -415,6 +415,14 @@ hr {
     font-size: 1.1em;
 }
 
+#artist a {
+    color: #8785A2;
+}
+
+#artist a:hover {
+    text-decoration: underline;
+}
+
 .icon-tag {
     color: #6e6c90;
     font-size: 1rem;
@@ -613,19 +621,22 @@ hr {
     position: fixed;
     bottom: 0;
     height: 3.5rem;
+    max-height: 15rem;
     z-index: 6;
     cursor: default;
     min-width: 650px;
+    box-shadow: 0 0 5px black;
+    background: #8785A2 linear-gradient(-45deg, rgba(255, 255, 255, .15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, .15) 50%, rgba(255, 255, 255, .15) 75%, transparent 75%, transparent);
+    background-size: 5rem 5rem;
+    opacity: 0.95;
+    -webkit-transition: all .5s ease;
+    transition: all .5s ease;
 }
 
 #player-bg {
     position: absolute;
     height: 3.5rem;
     width: 100%;
-    background: #8785A2 linear-gradient(-45deg, rgba(255, 255, 255, .15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, .15) 50%, rgba(255, 255, 255, .15) 75%, transparent 75%, transparent);
-    background-size: 5rem 5rem;
-    box-shadow: 0 0 5px black;
-    opacity: 0.95;
 }
 
 #player {
@@ -648,8 +659,11 @@ hr {
     from {
         text-shadow: 0 0 10px #222222;
     }
+    50% {
+        text-shadow: 0 0 3px #FFE2E2;
+    }
     to {
-        text-shadow: 0 0 10px #FFE2E2;
+        text-shadow: 0 0 10px #222222;
     }
 }
 
@@ -717,6 +731,20 @@ hr {
 .icon-message {
     font-size: 2rem;
     margin-right: 0.5rem;
+}
+
+#progress-playlist {
+    position: absolute;
+    top: 0;
+    width: 100%;
+    -webkit-transition: all .5s ease-out;
+    transition: all .5s ease-out;
+}
+
+#progress-box {
+    opacity: 1;
+    -webkit-transition: all .5s ease-out;
+    transition: all .5s ease-out;
 }
 
 .text-time {
@@ -849,38 +877,16 @@ hr {
     text-shadow: 0 0 3px #FFE2E2;
 }
 
-#playlist-banner {
-    background: #8785A2 linear-gradient(-45deg, rgba(255, 255, 255, .15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, .15) 50%, rgba(255, 255, 255, .15) 75%, transparent 75%, transparent);;
-    background-size: 5rem 5rem;
-    border-top-left-radius: 0.4rem;
-    border-top-right-radius: 0.4rem;
-    color: #ffe2e2;
-    font-size: 0.9rem;
-    line-height: 1.1rem;
-    cursor: default;
+#playlist-box {
+    margin-top: 0.75rem;
+    opacity: 0;
+    border-radius: 5px;
+    box-shadow: 0 0 15px #555555;
+    -webkit-transition: all .5s ease-out;
+    transition: all .5s ease-out;
 }
 
-#playlist-count {
-    text-shadow: 0 0 28px grey;
-}
-
-#playlist-clear {
-    border-left: 1px solid #f6f6f6;
-}
-
-#icon-clear {
-
-}
-
-#playlist-container {
-    background-color: #f6f6f6;
-    border-left: 2px solid #8785A2;
-    border-right: 2px solid #8785A2;
-    border-bottom: 4px solid #8785A2;
-    height: 15rem;
-}
-
-#playlist-container ol {
+#playlist-box ol {
     margin-bottom: 0;
     list-style-type: none !important;
     -webkit-margin-before: 0;
@@ -890,16 +896,9 @@ hr {
     -webkit-padding-start: 0;
 }
 
-#playlist-not-exist {
-    color: gray;
-    line-height: 15rem;
-    cursor: default;
-}
-
 #playlist-list {
-    font-size: 0.9rem;
-    line-height: 1.5rem;
     overflow: auto;
+    max-height: 13.5rem;
 }
 
 #playlist-list::-webkit-scrollbar-track {
@@ -911,7 +910,6 @@ hr {
 }
 
 #playlist-list::-webkit-scrollbar-thumb {
-    /*border-radius: 5px;*/
     background-color: #d0cedf;
 }
 
@@ -925,12 +923,62 @@ hr {
     background-color: #d0cedf;
 }
 
-.playlist-item {
+#playlist-not-exist {
+    padding-top: .25rem;
+    padding-bottom: .25rem;
+    text-align: center;
+    line-height: 1.75rem;
     color: #555555;
+    background-color: #e9e8f0;
+    border-radius: 5px;
+}
+
+@-webkit-keyframes playlist-item-appear {
+    from {
+        margin-top: -2rem;
+        opacity: 0;
+    }
+    to {
+        margin-top: 0;
+        opacity: 1;
+    }
+}
+
+@keyframes playlist-item-appear {
+    from {
+        margin-top: -2rem;
+        opacity: 0;
+    }
+    to {
+        margin-top: 0;
+        opacity: 1;
+    }
+}
+
+.playlist-item {
+    line-height: 1.75rem;
+    color: #555555;
+    -webkit-animation: playlist-item-appear .5s ease-out 1;
+    animation: playlist-item-appear .5s ease-out 1;
+}
+
+.playlist-item:nth-of-type(odd) {
+    background-color: #e9e8f0;
 }
 
 .playlist-item:nth-of-type(even) {
-    background-color: #e9e8f0;
+    background-color: rgba(255, 255, 255, 0.9);
+}
+
+.playlist-item:first-child {
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+}
+
+.playlist-item:last-child {
+    margin-bottom: 0 !important;
+    border-bottom-left-radius: 5px;
+    border-bottom-right-radius: 5px;
 }
 
 .playlist-item:hover {

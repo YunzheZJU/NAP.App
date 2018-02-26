@@ -127,7 +127,7 @@
                             所属专辑
                         </th>
                         <td>
-                            <a href="#" class="link">TVアニメ「少女終末旅行」オープニングテーマ「動く、動く」</a>
+                            <a id="album" href="#" class="link">TVアニメ「少女終末旅行」オープニングテーマ「動く、動く」</a>
                             <a href="http://www.nexushd.org" target="_blank" class="float-right">
                                 <span class="oi oi-external-link external"></span>
                             </a>
@@ -191,7 +191,6 @@
 </div>
 <div id="player" class="aplayer mx-auto" style="display: none"></div>
 <div id="player-container" class="container-fluid no-gutters px-0">
-    <div id="player-bg"></div>
     <!--Fixed at bottom-->
     <div class="col-12 col-lg-11 col-xl-10 mx-auto">
         <div class="container-fluid px-0 d-flex">
@@ -215,26 +214,33 @@
                 </div>
             </div>
             <div class="col-5 col-md-6 col-lg-7 px-0">
-                <div class="container-fluid px-0 d-flex">
-                    <div class="text-time col-2 col-md-1 px-0 mr-3">
-                        <p id="current-time" class="unselectable">
-                            00:00
-                        </p>
-                    </div>
-                    <div id="progress-container" class="col-8 col-md-10 my-auto px-0">
-                        <div id="progress-indicator">
-                            <span id="icon-progress-indicator" class="icomoon-radio-checked2 icon-indicator"></span>
+                <div id="progress-playlist">
+                    <div id="progress-box" class="d-flex">
+                        <div class="text-time col-2 col-md-1 px-0 mr-3">
+                            <p id="current-time" class="unselectable">
+                                00:00
+                            </p>
                         </div>
-                        <div id="progress-go" class="progress">
-                            <div id="progress-loaded" class="progress-bar" role="progressbar"></div>
-                            <div id="progress-played" class="progress-bar progress-bar-animated"
-                                 role="progressbar"></div>
+                        <div id="progress-container" class="col-8 col-md-10 my-auto px-0">
+                            <div id="progress-indicator">
+                                <span id="icon-progress-indicator" class="icomoon-radio-checked2 icon-indicator"></span>
+                            </div>
+                            <div id="progress-go" class="progress">
+                                <div id="progress-loaded" class="progress-bar" role="progressbar"></div>
+                                <div id="progress-played" class="progress-bar progress-bar-animated"
+                                     role="progressbar"></div>
+                            </div>
+                        </div>
+                        <div class="text-time col-2 col-md-1 px-0 ml-2">
+                            <p id="total-time" class="unselectable">
+                                00:00
+                            </p>
                         </div>
                     </div>
-                    <div class="text-time col-2 col-md-1 px-0 ml-2">
-                        <p id="total-time" class="unselectable">
-                            00:00
-                        </p>
+                    <div id="playlist-box">
+                        <ol id="playlist-list">
+                            <li id="playlist-not-exist">播放列表是空的</li>
+                        </ol>
                     </div>
                 </div>
             </div>
@@ -273,63 +279,63 @@
         </div>
     </div>
 </div>
-<div id="player-playlist">
-    <div id="playlist-banner">
-        <div class="container px-0 unselectable">
-            <div class="row no-gutters">
-                <div id="playlist-count" class="col-7 my-2 px-3">
-                    共<span id="playlist-count-number">0</span>首
-                </div>
-                <div id="playlist-clear" class="col-2 ml-auto my-2 px-1">
-                    <span id="icon-clear" class="icomoon-bin mx-1"></span>清空
-                </div>
-            </div>
-        </div>
-    </div>
-    <div id="playlist-container">
-        <p id="playlist-not-exist" class="text-center mb-0">还没有添加任何歌曲</p>
-        <ol id="playlist-list">
-            <!--<li class="playlist-item active">-->
-                <!--<div class="container px-0">-->
-                    <!--<div class="row no-gutters">-->
-                        <!--<div class="col-7 playlist-title px-2">-->
-                            <!--<a href="#">-->
-                                <!--動く、動く-->
-                            <!--</a>-->
-                        <!--</div>-->
-                        <!--<div class="col-3 playlist-artist px-1">-->
-                            <!--<a href="#">チト</a>-->
-                            <!--/-->
-                            <!--<a href="#">ユーリ</a>-->
-                        <!--</div>-->
-                        <!--<div class="col-2 playlist-duration px-2">-->
-                            <!--04:36-->
-                        <!--</div>-->
-                    <!--</div>-->
+<!--<div id="player-playlist">-->
+    <!--<div id="playlist-banner">-->
+        <!--<div class="container px-0 unselectable">-->
+            <!--<div class="row no-gutters">-->
+                <!--<div id="playlist-count" class="col-7 my-2 px-3">-->
+                    <!--共<span id="playlist-count-number">0</span>首-->
                 <!--</div>-->
-            <!--</li>-->
-            <!--<li class="playlist-item">-->
-                <!--<div class="container px-0">-->
-                    <!--<div class="row no-gutters">-->
-                        <!--<div class="col-7 playlist-title px-2">-->
-                            <!--<a href="#">-->
-                                <!--動く、動く-->
-                            <!--</a>-->
-                        <!--</div>-->
-                        <!--<div class="col-3 playlist-artist px-1">-->
-                            <!--<a href="#">チト</a>-->
-                            <!--/-->
-                            <!--<a href="#">ユーリ</a>-->
-                        <!--</div>-->
-                        <!--<div class="col-2 playlist-duration px-2">-->
-                            <!--04:36-->
-                        <!--</div>-->
-                    <!--</div>-->
+                <!--<div id="playlist-clear" class="col-2 ml-auto my-2 px-1">-->
+                    <!--<span id="icon-clear" class="icomoon-bin mx-1"></span>清空-->
                 <!--</div>-->
-            <!--</li>-->
-        </ol>
-    </div>
-</div>
+            <!--</div>-->
+        <!--</div>-->
+    <!--</div>-->
+    <!--<div id="playlist-container">-->
+        <!--<p id="playlist-not-exist" class="text-center mb-0">还没有添加任何歌曲</p>-->
+        <!--<ol id="playlist-list">-->
+            <!--&lt;!&ndash;<li class="playlist-item active">&ndash;&gt;-->
+                <!--&lt;!&ndash;<div class="container px-0">&ndash;&gt;-->
+                    <!--&lt;!&ndash;<div class="row no-gutters">&ndash;&gt;-->
+                        <!--&lt;!&ndash;<div class="col-7 playlist-title px-2">&ndash;&gt;-->
+                            <!--&lt;!&ndash;<a href="#">&ndash;&gt;-->
+                                <!--&lt;!&ndash;動く、動く&ndash;&gt;-->
+                            <!--&lt;!&ndash;</a>&ndash;&gt;-->
+                        <!--&lt;!&ndash;</div>&ndash;&gt;-->
+                        <!--&lt;!&ndash;<div class="col-3 playlist-artist px-1">&ndash;&gt;-->
+                            <!--&lt;!&ndash;<a href="#">チト</a>&ndash;&gt;-->
+                            <!--&lt;!&ndash;/&ndash;&gt;-->
+                            <!--&lt;!&ndash;<a href="#">ユーリ</a>&ndash;&gt;-->
+                        <!--&lt;!&ndash;</div>&ndash;&gt;-->
+                        <!--&lt;!&ndash;<div class="col-2 playlist-duration px-2">&ndash;&gt;-->
+                            <!--&lt;!&ndash;04:36&ndash;&gt;-->
+                        <!--&lt;!&ndash;</div>&ndash;&gt;-->
+                    <!--&lt;!&ndash;</div>&ndash;&gt;-->
+                <!--&lt;!&ndash;</div>&ndash;&gt;-->
+            <!--&lt;!&ndash;</li>&ndash;&gt;-->
+            <!--&lt;!&ndash;<li class="playlist-item">&ndash;&gt;-->
+                <!--&lt;!&ndash;<div class="container px-0">&ndash;&gt;-->
+                    <!--&lt;!&ndash;<div class="row no-gutters">&ndash;&gt;-->
+                        <!--&lt;!&ndash;<div class="col-7 playlist-title px-2">&ndash;&gt;-->
+                            <!--&lt;!&ndash;<a href="#">&ndash;&gt;-->
+                                <!--&lt;!&ndash;動く、動く&ndash;&gt;-->
+                            <!--&lt;!&ndash;</a>&ndash;&gt;-->
+                        <!--&lt;!&ndash;</div>&ndash;&gt;-->
+                        <!--&lt;!&ndash;<div class="col-3 playlist-artist px-1">&ndash;&gt;-->
+                            <!--&lt;!&ndash;<a href="#">チト</a>&ndash;&gt;-->
+                            <!--&lt;!&ndash;/&ndash;&gt;-->
+                            <!--&lt;!&ndash;<a href="#">ユーリ</a>&ndash;&gt;-->
+                        <!--&lt;!&ndash;</div>&ndash;&gt;-->
+                        <!--&lt;!&ndash;<div class="col-2 playlist-duration px-2">&ndash;&gt;-->
+                            <!--&lt;!&ndash;04:36&ndash;&gt;-->
+                        <!--&lt;!&ndash;</div>&ndash;&gt;-->
+                    <!--&lt;!&ndash;</div>&ndash;&gt;-->
+                <!--&lt;!&ndash;</div>&ndash;&gt;-->
+            <!--&lt;!&ndash;</li>&ndash;&gt;-->
+        <!--</ol>-->
+    <!--</div>-->
+<!--</div>-->
 <script type="text/javascript" src="include/jquery.js"></script>
 <script type="text/javascript" src="include/popper.js"></script>
 <script type="text/javascript" src="include/jquery.popup.js"></script>
