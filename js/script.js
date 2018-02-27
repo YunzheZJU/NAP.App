@@ -3,15 +3,16 @@
  */
 
 'use strict';
-const $title = $('#title');
-const $album = $('#album');
-const $artist = $('#artist');
+const $bg_image = $('#bg-image');
 const $disc_group = $('#disc-group');
 const $disc_cover = $('#disc-cover');
 const $disc_mask = $('#disc-mask');
 const $disc_play = $('#disc-play');
 const $disc_light = $('#disc-light');
 const $disc_needle = $('#disc-needle');
+const $title = $('#title');
+const $album = $('#album');
+const $artist = $('#artist');
 const $btn_play = $('#btn-play');
 const $btn_add = $('#btn-add');
 const $btn_favorite = $('#btn-favorite');
@@ -77,7 +78,8 @@ const clipboard = new Clipboard('#btn-share', {
     }
 });
 let currentId = 7;
-let artistsHtml = [];
+// let artistsHtml = [];
+let currentArtists = [];
 let newTime = null;
 let baseTime = null;
 let mouseDownX;
@@ -180,34 +182,51 @@ $(function () {
     $('[data-toggle="tooltip"]').tooltip()
 });
 
+// Read in playlist
+$(function () {
+    let list = localStorage.getItem('list');
+    if (!list) {
+        list = [];
+    } else {
+        $playlist_not_exist.remove();
+        list = JSON.parse(list);
+    }
+    listCount = list.length;
+    console.log('Playlist previous' + JSON.stringify(list));
+    list.forEach(function (element) {
+        appendPlaylist(element);
+    });
+});
+
 // Set up player
 $(function () {
     $.get("http://api.anisong.niconi.cc/song/simple", {id: currentId}, function (data) {
         console.log(data);
         let song = data[0];
-        let tempArray = [];
-        artistsHtml = [];
+        let artistsList = [];
+        let artistsHtml = [];
         song['simpleArtistInfos'].forEach(function (element) {
-            tempArray.push(element['name']);
-            artistsHtml.push('<a href="#">' + element['name'] + '</a>')
+            artistsList.push(element['name']);
+            artistsHtml.push('<a href="#">' + element['name'] + '</a>');
         });
-        const autherlist = tempArray.join('/');
+        currentArtists = artistsList.join('/');
         artistsHtml = artistsHtml.join('/');
         musicInfo = {
             id: currentId,
             title: song['title'],
-            author: autherlist,
+            author: currentArtists,
             album: song['simpleAlbumInfo'].title,
             url: 'http://api.anisong.niconi.cc' + song['fileUrl'],
             pic: 'http://api.anisong.niconi.cc' + song['imageUrl'],
             lrc: 'lyric/1.lrc'
         };
         $disc_cover.attr('src', musicInfo.pic);
+        $bg_image.attr('src', musicInfo.pic);
         $title.text(musicInfo.title);
         $album.text(musicInfo.album);
         $artist.html(artistsHtml);
         // $control_toggle.click();
-        localStorage.clear();
+        // localStorage.clear();
     });
 });
 
@@ -433,6 +452,10 @@ $btn_add.click(function () {
         addToPlaylist();
     } else {
         initiatePlayer(musicInfo);
+        if (listCount) {
+            console.log('hit:' + listCount);
+            $player_container.css('height', (1.5 + listCount * 2.25) + 'rem');
+        }
     }
     if (showList) {
         if (listCount) {
@@ -572,13 +595,15 @@ function onDraggingVolumeIndicator(event) {
 $prograss_go.click(function (event) {
     const percentage = event.offsetX / progressContainerWidth;
     newTime = percentage * totalTime;
-    if (!ap.audio.paused) {
-        ap.play(newTime);
-        newTime = null;
-    } else {
-        $prograss_indicator.css('left', event.offsetX - 7 + 'px');
-        $prograss_played.css('width', percentage * 100 + '%');
-        $current_time[0].innerText = convertTimeFromNumber(newTime);
+    if (ap) {
+        if (!ap.audio.paused) {
+            ap.play(newTime);
+            newTime = null;
+        } else {
+            $prograss_indicator.css('left', event.offsetX - 7 + 'px');
+            $prograss_played.css('width', percentage * 100 + '%');
+            $current_time[0].innerText = convertTimeFromNumber(newTime);
+        }
     }
 });
 
@@ -741,32 +766,45 @@ function addToPlaylist() {
     }
     listCount++;
     let list = localStorage.getItem('list');
-    const item = {
-        id: musicInfo.id,
-        name: musicInfo.title,
-        artist: artistsHtml,
-        duration: convertTimeFromNumber(totalTime)
-    };
     if (!list) {
         list = [];
     } else {
         list = JSON.parse(list);
     }
     console.log('Playlist previous' + JSON.stringify(list));
+    const item = {
+        num: list.length + 1,
+        id: musicInfo.id,
+        name: musicInfo.title,
+        artist: musicInfo.author,
+        duration: convertTimeFromNumber(totalTime)
+    };
     list.push(item);
     localStorage.setItem('list', JSON.stringify(list));
     console.log('Playlist is updated to' + JSON.stringify(list));
     // Update UI
-    let html = '<li class="container-fluid playlist-item py-1" data-id="' + item.id + '">' +
+    appendPlaylist(item);
+}
+
+function appendPlaylist(item) {
+    let html = '<li class="container-fluid playlist-item py-1" data-num="' + item.num + '" data-id="' + item.id + '">' +
         '<div class="row unselectable">' +
         '<div class="col-4 col-md-5 col-lg-7 playlist-title"><a href="#">' + item.name + '</a></div>' +
-        '<div class="col-4 col-md-4 col-lg-3 playlist-artist">' + item.artist + '</div>' +
+        '<div class="col-4 col-md-4 col-lg-3 playlist-artist">' + convertArtistsHTMLFromString(item.artist) + '</div>' +
         '<div class="col-4 col-md-3 col-lg-2 playlist-duration">' + item.duration + '</div>' +
         '</div>' +
         '</li>';
     $playlist_list.append(function () {
         return html;
     });
+}
+
+function convertArtistsHTMLFromString(artistsList) {
+    let artistsHTML = [];
+    artistsList.split('/').forEach(function (element) {
+        artistsHTML.push('<a href="#">' + element + '</a>');
+    });
+    return artistsHTML.join('/');
 }
 
 // TODO: Active playlist item
