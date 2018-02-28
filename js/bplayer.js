@@ -29,48 +29,6 @@ class PlaylistItem {
     }
 }
 
-class BDisc {
-    constructor() {
-
-    }
-}
-
-class BTime {
-    constructor() {
-
-    }
-}
-
-class BVolume {
-    constructor() {
-
-    }
-}
-
-class BCirculation {
-    constructor() {
-
-    }
-}
-
-/**
- * 只管理一首歌，通过有计划地改变src来达到切歌的效果
- */
-class BAudio {
-    constructor(parent) {
-        this.parent = parent;
-        this.src = null;
-    }
-
-    pauseSong() {
-
-    }
-
-    play() {
-
-    }
-}
-
 /**
  * Model
  * 数据模型：
@@ -83,6 +41,11 @@ class BPlaylist {
     constructor() {
         this.playlist = [];
         this.audio = $('#bplayer')[0];
+        this.isPlaylistVisible = false;
+        this.circulationMode = 3;
+        this.circulationModeDict = {1: 'random', 2: 'single', 3: 'circulation', 4: 'order'};
+        this.volumeBeforeMute = 0;
+        this.currentSong = 1;
     }
 
     /**
@@ -101,10 +64,14 @@ class BPlaylist {
         this.addItemsToPlaylist(newPlaylistItem);
     }
 
-    addItemsToPlaylist(playlistItem) {
-        this.playlist.push(playlistItem);
+    /**
+     * 根据传入的条目信息列表，为播放列表新增数据
+     * @param playlistItemList 将要新增的条目信息列表
+     */
+    addItemsToPlaylist(playlistItemList) {
+        this.playlist.push(playlistItemList);
         // 更新UI
-        bRender.addItemsToPlaylist(playlistItem);
+        bRender.addItemsToPlaylist(playlistItemList);
     }
 
     /**
@@ -124,18 +91,53 @@ class BPlaylist {
      * 从浏览器的Local Storage读取播放列表并附加到当前播放列表
      */
     restorePlaylistFromLocalStorage() {
-        const playlistItemsString = localStorage.getItem('list');
-        let playlistItems = playlistItemsString ? JSON.parse(playlistItemsString) : [];
-        console.log(`BPlaylist::loadPlaylistFromLocalStorage(): Playlist is loaded successfully: ${JSON.stringify(playlistItems)}`);
-        this.addItemsToPlaylist(playlistItems);
+        // 从浏览器的Local Storage中，以'playlist'为键，读取播放列表字符串
+        const playlistItemListString = localStorage.getItem('playlist') || "[]";
+        console.log(`BPlaylist::loadPlaylistFromLocalStorage(): Playlist is loaded successfully: ${playlistItemListString}`);
+        // 作为JSON字符串解析为Array
+        let playlistItemList = JSON.parse(playlistItemListString);
+        // 批量加到播放列表中
+        this.addItemsToPlaylist(playlistItemList);
     }
 
     /**
      * 将当前播放列表存储（更新）至浏览器的Local Storage，一般在操作播放列表后执行一次
      */
     storePlaylistIntoLocalStorge() {
-        localStorage.setItem('list', JSON.stringify(this.playlist));
+        // 将当前播放列表转换为JSON字符串，以'playlist'为键，存入Local Storage
+        localStorage.setItem('playlist', JSON.stringify(this.playlist));
         console.log(`BPlaylist::storePlaylistIntoLocalStorge(): Playlist is updated successfully: ${JSON.stringify(this.playlist)}`);
+    }
+
+    /**
+     * 根据传入的可见性状态值，改变播放列表的可见性
+     * @param visible 布尔值，true表示设置为可见
+     */
+    togglePlaylistVisibility(visible) {
+        if (visible === undefined) {
+            if (this.isPlaylistVisible) {
+                this.isPlaylistVisible = false;
+            } else {
+                this.isPlaylistVisible = true;
+            }
+        } else {
+            this.checkBoolean(visible, 'togglePlaylistVisible', this);
+            if (visible) {
+                this.isPlaylistVisible = true;
+            } else if (!visible) {
+                this.isPlaylistVisible = false;
+            }
+        }
+        // 更新UI
+        bRender.setPlaylistVisibilityTo(this.isPlaylistVisible);
+    }
+
+    /**
+     * 获取播放列表的歌曲数
+     * @return {number} 播放列表的歌曲数
+     */
+    getPlaylistCount() {
+        return this.playlist.length;
     }
 
     /**
@@ -144,36 +146,7 @@ class BPlaylist {
     playCurrentSong() {
         this.audio.play();
         // 更新UI
-        bRender.setPlayingStateTo('playing');
-    }
-
-    /**
-     * 根据传入的播放状态，设置播放器到相应的播放状态
-     * @param state 将要设置的播放状态，可选值{'playing', 'paused', undefined}
-     * 若state值为undefined，将在'playing'和'paused'之间来回切换
-     */
-    toggleCurrentSong(state) {
-        BPlaylist.checkPlayingState(state, 'toggleCurrentSong');
-        if (state === 'playing') {
-            this.playCurrentSong();
-        } else if (state === 'paused') {
-            this.pauseCurrentSong();
-        } else {
-            if (this.audio.paused) {
-                this.playCurrentSong();
-            } else {
-                this.pauseCurrentSong();
-            }
-        }
-    }
-
-    /**
-     * 根据传入的时间值，跳转至当前歌曲的指定位置，保持原来的播放状态
-     * @param second 将要跳转至的时间值，单位为秒，可以是小数
-     */
-    seekCurrentSongTo(second) {
-        this.audio.currentTime = second;
-        // TODO: 更新UI
+        bRender.setPlayingstatusTo('playing');
     }
 
     /**
@@ -182,11 +155,78 @@ class BPlaylist {
     pauseCurrentSong() {
         this.audio.pause();
         // 更新UI
-        bRender.setPlayingStateTo('paused');
+        bRender.setPlayingstatusTo('paused');
     }
 
     /**
-     * 根据传入的播放列表编号，将指定的歌曲加载入播放器
+     * 根据传入的播放状态，设置播放器到相应的播放状态
+     * @param playing 将要设置的播放状态，应为布尔值或undefined
+     * 若playing值为undefined，将在'playing'和'paused'之间来回切换
+     */
+    toggleCurrentSong(playing) {
+        if (playing === undefined) {
+            if (this.audio.paused) {
+                this.playCurrentSong();
+            } else {
+                this.pauseCurrentSong();
+            }
+        } else {
+            BPlaylist.checkBoolean(playing, 'toggleCurrentSong', this);
+            if (playing) {
+                this.playCurrentSong();
+            } else if (!playing) {
+                this.pauseCurrentSong();
+            }
+        }
+    }
+
+    /**
+     * 根据传入的播放进度，跳转至当前歌曲的对应时间，保持原来的播放状态
+     * @param percentage 将要跳转至的播放进度，范围为[0, 100]，可以为小数
+     */
+    seekCurrentSongTo(percentage) {
+        BPlaylist.checkPercentage(percentage, 'seekCurrentSongTo', this);
+        this.audio.currentTime = percentage / 100 * this.audio.duration;
+        // 更新UI
+        bRender.setTimeIndicator(percentage);
+    }
+
+    seekingCurrentSongAt(percentage) {
+        BPlaylist.checkPercentage(percentage, 'seekingCurrentSongAt', this);
+        // TODO: 更新UI
+
+    }
+
+    finishSeekingCurrentSongAt(percentage) {
+        BPlaylist.checkPercentage(percentage, 'finishSeekingCurrentSongAt', this);
+        // TODO: 更新UI
+
+    }
+
+    /**
+     * 选择播放列表中的上一首歌并播放，若当前歌曲为第一首则选择播放列表中的最后一首播放
+     */
+    playPreviousSong() {
+        this.pauseCurrentSong();
+        const currentSong = (this.currentSong - 1) || this.playlist.length;
+        this.setSong(currentSong);
+        // TODO: 想办法在完成加载之后播放这首歌
+    }
+
+    /**
+     * 选择播放列表中的下一首歌并播放，若当前歌曲为最后一首则选择播放列表中的第一首播放
+     */
+    playNextSong() {
+        this.pauseCurrentSong();
+        let currentSong = this.currentSong + 1;
+        currentSong = (currentSong > this.playlist.length) ? 0 : currentSong;
+        this.setSong(currentSong);
+        // TODO: 想办法在完成加载之后播放这首歌
+    }
+
+
+    /**
+     * 根据传入的播放列表编号，将指定的歌曲加载入播放器，并不意味着会自动播放
      * @param num 将要播放的歌曲在播放列表中的编号
      */
     setSong(num) {
@@ -196,6 +236,9 @@ class BPlaylist {
         const musicInfo = this.playlist[num - 1].musicInfo;
         // 设置歌曲源
         this.audio.src = musicInfo.url;
+        // 记录当前播放的歌曲在播放列表中的编号
+        this.currentSong = num;
+        // TODO: 想办法在完成加载之后播放这首歌
         // TODO: 是否需要清理？
         // 更新UI
         bRender.setSong(musicInfo);
@@ -209,30 +252,34 @@ class BPlaylist {
         BPlaylist.checkVolume(volume, 'setVolumeTo', this);
         this.audio.volume = volume;
         // 更新UI
-        bRender.setVolumeIndicator(volume);
-        if (volume > 0.8) {
-            bRender.setVolumeIcon('high');
-        } else if (volume > 0.3) {
-            bRender.setVolumeIcon('medium');
-        } else if (volume > 0) {
-            bRender.setVolumeIcon('low');
-        } else {
-            bRender.setVolumeIcon('mute');
-        }
+        this.updateVolumeUI(volume);
     }
 
     /**
-     * 进入静音状态
+     * 进入静音状态并存储静音前的音量值
      */
-    saveVolumeAndMute() {
-
+    storeVolumeAndMute() {
+        this.volumeBeforeMute = this.audio.volume;
+        // 更新UI
+        this.updateVolumeUI(0);
     }
 
     /**
-     * 从静音状态恢复
+     * 读取静音前的音量值并从静音状态恢复
      */
-    loadVolumeFromMute() {
+    restoreVolumeFromMute() {
+        this.audio.volume = this.volumeBeforeMute;
+        // 更新UI
+        this.updateVolumeUI(this.audio.volume);
+    }
 
+    /**
+     * 轮换循环模式，顺序为{'random', 'single', 'circulation', 'order'}
+     */
+    toggleCirculation() {
+        this.circulationMode = (this.circulationMode + 1) % this.circulationModeDict.length;
+        // 更新UI
+        bRender.setCirculationIcon(this.circulationModeDict[this.circulationMode]);
     }
 
     /**
@@ -251,16 +298,39 @@ class BPlaylist {
     }
 
     /**
+     * 检查传入的百分数是否在设定的范围内，若不在范围内则抛出错误
+     * @param num 将要检查的数值
+     * @param upper 范围上界（包含）
+     * @param lower 范围下界（包含）
+     * @param description 对将要检查的数值的描述
+     * @param functionName 抛出错误时使用的函数名
+     * @param thisRef 上下文，用于获取抛出错误时使用的类名
+     */
+    static checkRange(num, upper, lower, description, functionName, thisRef) {
+        thisRef = thisRef || this;
+        if (!(num >= lower && num <= upper)) {
+            throw new RangeError(`${thisRef.constructor.name}::${functionName}(): ${description}超出范围，应在[${lower}, ${upper}]内`);
+        }
+    }
+
+    /**
      * 检查传入的音量值是否在范围内，若不在范围内则抛出错误
      * @param volume 将要检查的音量值
      * @param functionName 调用此函数时所在函数的名字
      * @param thisRef 调用此函数时的上下文，用于获取类名
      */
     static checkVolume(volume, functionName, thisRef) {
-        thisRef = thisRef || this;
-        if (!(volume >= 0 && volume <= 1)) {
-            throw new RangeError(`${thisRef.constructor.name}::${functionName}(): 音量值超出范围，应在[0, 1]内`);
-        }
+        this.checkRange(volume, 0, 1, '音量值', functionName, thisRef);
+    }
+
+    /**
+     * 检查传入的百分数是否在范围内，若不在范围内则抛出错误
+     * @param volume 将要检查的百分数
+     * @param functionName 调用此函数时所在函数的名字
+     * @param thisRef 调用此函数时的上下文，用于获取类名
+     */
+    static checkPercentage(volume, functionName, thisRef) {
+        this.checkRange(volume, 0, 100, '百分数', functionName, thisRef);
     }
 
     /**
@@ -277,16 +347,35 @@ class BPlaylist {
     }
 
     /**
-     * 检查传入的播放状态值是否为预设值之一，应为{'playing', 'paused'}之一，若不是则抛出错误
-     * @param state 将要检查的播放状态值
+     * 检查传入的参数是否为布尔值，若不是则抛出错误
+     * @param bool 将要检查的参数值
      * @param functionName 调用此函数时所在函数的名字
      * @param thisRef 调用此函数时的上下文，用于获取类名
      */
-    static checkPlayingState(state, functionName, thisRef) {
+    static checkBoolean(bool, functionName, thisRef) {
         thisRef = thisRef || this;
-        if (['playing', 'paused'].indexOf(state) === -1) {
-            throw new RangeError(`${thisRef.constructor.name}::${functionName}(): 指定的播放状态未定义`);
+        if (typeof bool !== "boolean") {
+            throw new TypeError(`${thisRef.constructor.name}::${functionName}(): 参数类型不正确，应为布尔值`);
         }
+    }
+
+    /**
+     * 根据传入的音量值，更新音量UI
+     * @param volume 将要显示的音量值
+     */
+    static updateVolumeUI(volume) {
+        bRender.setVolumeIndicator(volume);
+        let type;
+        if (volume > 0.8) {
+            type = 'high';
+        } else if (volume > 0.3) {
+            type = 'medium';
+        } else if (volume > 0) {
+            type = 'low';
+        } else {
+            type = 'mute';
+        }
+        bRender.setVolumeIcon(type);
     }
 }
 
@@ -339,11 +428,11 @@ class BPlayer {
 
     /**
      * 根据传入的播放状态，设置播放器到相应的播放状态
-     * @param state 将要设置的播放状态，可选值{'playing', 'paused', undefined}
-     * 若state值为undefined，将在'playing'和'paused'之间来回切换
+     * @param playing 将要设置的播放状态，应为布尔值或undefined
+     * 若playing值为undefined，将在'playing'和'paused'之间来回切换
      */
-    toggleCurrentSong(state) {
-        bPlaylist.toggleCurrentSong(state);
+    toggleCurrentSong(playing) {
+        bPlaylist.toggleCurrentSong(playing);
     }
 
     /**
@@ -365,14 +454,14 @@ class BPlayer {
      * 从播放列表中选择上一曲播放，若已为第一首，选择最后一首播放
      */
     playPreviousSong() {
-
+        bPlaylist.playPreviousSong();
     }
 
     /**
      * 从播放列表中选择下一曲播放，若已为最后一首，选择第一首播放
      */
     playNextSong() {
-
+        bPlaylist.playNextSong();
     }
 
     /**
@@ -387,22 +476,30 @@ class BPlayer {
      * 进入静音状态
      */
     saveVolumeAndMute() {
-        bPlaylist.saveVolumeAndMute();
+        bPlaylist.storeVolumeAndMute();
     }
 
     /**
      * 从静音状态恢复
      */
     loadVolumeFromMute() {
-        bPlaylist.loadVolumeFromMute();
+        bPlaylist.restoreVolumeFromMute();
     }
 
     /**
-     * 设置循环模式
-     * @param mode 将要设置的循环模式类型值，可选{'random', 'single', 'circulation', 'order'}
+     * 轮换循环模式
      */
-    setCirculationTo(mode) {
+    toggleCirculation() {
+        bPlaylist.toggleCirculation();
+    }
 
+    /**
+     * 根据传入的播放列表可见性，设置播放列表到相应的显示状态
+     * @param visible 将要设置的播放列表可见性状态值，应为布尔值或undefined
+     * 若visible值为undefined，将在'visible'和'hidden'之间来回切换
+     */
+    togglePlaylistVisibility(visible) {
+        bPlaylist.togglePlaylistVisibility(visible);
     }
 }
 
@@ -416,17 +513,48 @@ class BRender {
      * @param e
      */
     constructor(e) {
-
+        this.volumeIconDict = {
+            'mute': 'icomoon-volume-mute2',
+            'low': 'icomoon-volume-low',
+            'medium': 'icomoon-volume-medium',
+            'high': 'icomoon-volume-high'
+        }
+        this.circulationIconDict = {
+            'random': 'icomoon-shuffle',
+            'single': 'icomoon-infinite',
+            'circulation': 'icomoon-loop',
+            'order': 'icomoon-arrow-right2'
+        }
+        // TODO: 添加侦听器
     }
 
     /**
      * 根据传入的播放状态值改变UI的状态，包括“唱片”的转动状态和底部“播放按钮”
      * 在唱片停止转动的状态下显示一个播放按钮，并为它绑定一个事件
-     * @param state 将要设定的播放状态，可选{'playing', 'paused'}
+     * @param playing 将要设定的播放状态，应为布尔值，true表示播放
      */
-    setPlayingStateTo(state) {
-        BPlaylist.checkPlayingState(state, 'setPlayingStateTo', this);
-        // TODO
+    setPlayingstatusTo(playing) {
+        // 检查参数类型
+        BPlaylist.checkBoolean(playing, 'setPlayingstatusTo', this);
+
+        function toggleCurrentSong() {
+            bPlayer.toggleCurrentSong();
+        }
+
+        // 设置唱片样式
+        if (playing) {
+            $disc_needle.css('transform', 'translate(-15.15%, -9.09%) scale(0.25) rotateZ(' + needle_rotation_max + ')');
+            $disc_play.css({'opacity': '0', 'cursor': 'default'});
+            $disc_light.one('click', toggleCurrentSong);
+            // 没办法才这么做
+            $disc_play.one('click', toggleCurrentSong);
+        } else {
+            $disc_needle.css('transform', 'translate(-15.15%, -9.09%) scale(0.25) rotateZ(-60deg)');
+            $disc_play.css({'opacity': '1', 'cursor': 'pointer'});
+            $disc_play.one('click', toggleCurrentSong);
+        }
+        // 一键切换底部按钮样式，可能会产生问题，先用着看看
+        $control_toggle.toggleClass('icomoon-pause icomoon-play2 control-toggle-animated')
     }
 
     /**
@@ -450,8 +578,13 @@ class BRender {
      * @param volume 将要设置的音量值，范围为[0, 1]
      */
     setVolumeIndicator(volume) {
+        // 检查参数类型
         BPlaylist.checkVolume(volume, 'setVolumeIndicator', this);
-        // TODO
+        // 计算值
+        const value = `${volume * 100}%`
+        // 改变样式
+        $volume_indicator.css('left', value);
+        $volume_value.css('width', value);
     }
 
     /**
@@ -459,9 +592,12 @@ class BRender {
      * @param type 将要设置的音量图标类型值，可选{'mute', ‘low’, 'medium', 'high'}
      */
     setVolumeIcon(type) {
-        BRender.checkVolumeIcon(type, 'setVolumeIcon');
-        // TODO
-
+        // 检查参数类型并映射样式
+        const value = this.checkVolumeIcon(type, 'setVolumeIcon');
+        this.volumeIconDict[type];
+        // 改变样式
+        $control_volume.removeClass();
+        $control_volume.addClass(value);
     }
 
     /**
@@ -469,18 +605,35 @@ class BRender {
      * @param mode 将要设置的循环模式图标类型值，可选{'random', 'single', 'circulation', 'order'}
      */
     setCirculationIcon(mode) {
-        BRender.checkCirculationIcon(mode, 'setCirculationIcon');
-        // TODO
-
+        // 检查参数类型并映射样式
+        const value = this.checkCirculationIcon(mode, 'setCirculationIcon');
+        // 改变样式
+        $control_mode.removeClass();
+        $control_mode.addClass(value);
     }
 
     /**
      * 根据传入的播放列表可见性状态值，设置一系列样式，改变播放列表可见性
-     * @param state
+     * @param visible 将要设置的播放列表可见性状态值，应为布尔值
      */
-    setPlaylistVisibilityTo(state) {
-        // TODO: 是否可以用auto的高度代替固定的高度值
-        
+    setPlaylistVisibilityTo(visible) {
+        BPlaylist.checkBoolean(visible, 'setPlaylistVisibilityTo', this);
+        if (visible) {
+            $progress_playlist.css('top', '0');
+            $progress_box.css('opacity', '1');
+            $playlist_box.css('opacity', '0');
+            $player_container.css('height', '3.5rem');
+        } else {
+            $progress_playlist.css('top', '-3.5rem');
+            $progress_box.css('opacity', '0');
+            $playlist_box.css('opacity', '1');
+            // 获取播放列表中的歌曲数
+            const playlistCount = bPlaylist.getPlaylistCount();
+            // 计算所需高度
+            let value = `${1.25 + (playlistCount || 1) * 2.25}rem`;
+            // 改变样式
+            $player_container.css('height', value);
+        }
     }
 
     /**
@@ -521,7 +674,7 @@ class BRender {
     }
 
     /**
-     * 根据传入的歌曲信息，相应设置页面内容，这个方法仅在切换页面时会被调用，切换歌曲不应该造成页面改变
+     * 根据传入的歌曲信息，相应设置页面内容，这个方法应仅在切换页面时被调用，切换歌曲不应该造成页面改变
      * @param musicInfo 将要设置的歌曲信息
      */
     setSong(musicInfo) {
@@ -534,27 +687,41 @@ class BRender {
         // TODO: 是否要将播放进度指示器归位？
     }
 
-    static addLinkToArtists(artistsList) {
-        return artistsList.split('/').map((artist) => '<a href="#">' + artist + '</a>').join('/');
-    }
-
     /**
      * 检查传入的音量图标类型值，若不是预设值之一则抛出错误
      * @param type 将要检查的音量图标类型值，可选{'mute', 'low', 'medium', 'high'}
+     * @return {*} 音量图标类型对应的值
      */
-    static checkVolumeIcon(type, functionName) {
-        if (['mute', 'low', 'medium', 'high'].indexOf(type) === -1) {
+    checkVolumeIcon(type, functionName) {
+        const value = this.volumeIconDict[type]
+        if (value === undefined) {
             throw new RangeError(`BRender::${functionName}(): 指定的音量图标类型未定义`);
+        } else {
+            return value;
         }
     }
 
     /**
      * 检查传入的循环模式图标类型值，若不是预设值之一则抛出错误
      * @param type 将要检查的循环模式图标类型值，可选{'random', 'single', 'circulation', 'order'}
+     * @return {*} 循环模式图标类型对应的值
      */
-    static checkCirculationIcon(mode, functionName) {
-        if (['mute', 'low', 'medium', 'high'].indexOf(mode) === -1) {
+    checkCirculationIcon(mode, functionName) {
+        const value = this.circulationIconDict[mode]
+        if (value === undefined) {
             throw new RangeError(`BRender::${functionName}(): 指定的循环模式图标类型未定义`);
+        } else {
+            return value;
         }
+    }
+
+    /**
+     * 为歌手列表文本添加超链接
+     * TODO: 超链接中应包含有效链接
+     * @param artistsList 歌手列表文本
+     * @return {string} 带有超链接的歌手列表文本
+     */
+    static addLinkToArtists(artistsList) {
+        return artistsList.split('/').map((artist) => '<a href="#">' + artist + '</a>').join('/');
     }
 }
