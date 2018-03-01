@@ -46,6 +46,7 @@ class BPlaylist {
         this.circulationModeDict = {1: 'random', 2: 'single', 3: 'circulation', 4: 'order'};
         this.volumeBeforeMute = 0;
         this.currentSong = 1;
+        this.savedTime = 0;
     }
 
     /**
@@ -121,7 +122,7 @@ class BPlaylist {
                 this.isPlaylistVisible = true;
             }
         } else {
-            this.checkBoolean(visible, 'togglePlaylistVisible', this);
+            this.checkBoolean(visible, 'togglePlaylistVisibility', this);
             if (visible) {
                 this.isPlaylistVisible = true;
             } else if (!visible) {
@@ -158,6 +159,10 @@ class BPlaylist {
         bRender.setPlayingstatusTo('paused');
     }
 
+    isPlaying() {
+        return !this.audio.paused;
+    }
+
     /**
      * 根据传入的播放状态，设置播放器到相应的播放状态
      * @param playing 将要设置的播放状态，应为布尔值或undefined
@@ -181,26 +186,37 @@ class BPlaylist {
     }
 
     /**
-     * 根据传入的播放进度，跳转至当前歌曲的对应时间，保持原来的播放状态
-     * @param percentage 将要跳转至的播放进度，范围为[0, 100]，可以为小数
+     * 保存当前时间
      */
-    seekCurrentSongTo(percentage) {
+    saveCurrentTime() {
+        this.savedTime = this.audio.currentTime;
+    }
+
+    /**
+     * 根据传入的播放进度，跳转至当前歌曲的对应时间，保持原来的播放状态，若在寻找状态则显示popup
+     * @param percentage 将要跳转至的播放进度，范围为[0, 100]，可以为小数
+     * @param isSeeking 是否处于“查找状态”，若是则不操作音频，否则设置音频播放进度
+     */
+    seekCurrentSongTo(percentage, isSeeking) {
         BPlaylist.checkPercentage(percentage, 'seekCurrentSongTo', this);
-        this.audio.currentTime = percentage / 100 * this.audio.duration;
+        BPlaylist.checkBoolean(isSeeking, 'seekCurrentSongTo', this);
+        if (!isSeeking) {
+            // 非查找状态下，直接跳转
+            this.audio.currentTime = percentage / 100 * this.audio.duration;
+        } else {
+            // UI: 显示popup
+            bRender.showDeltaTime(); // TODO: Parameters
+        }
         // 更新UI
         bRender.setTimeIndicator(percentage);
     }
 
-    seekingCurrentSongAt(percentage) {
-        BPlaylist.checkPercentage(percentage, 'seekingCurrentSongAt', this);
-        // TODO: 更新UI
-
-    }
-
-    finishSeekingCurrentSongAt(percentage) {
-        BPlaylist.checkPercentage(percentage, 'finishSeekingCurrentSongAt', this);
-        // TODO: 更新UI
-
+    /**
+     * 退出寻找状态，消去popup
+     */
+    finishSeeking() {
+        // 更新UI
+        bRender.hideDeltaTime(this.audio.duration);
     }
 
     /**
@@ -387,6 +403,8 @@ class BPlaylist {
  */
 class BPlayer {
     constructor() {
+        this.seekingTargetList = ['time', 'volume'];
+        this.seekingTarget = null;
     }
 
     /**
@@ -436,11 +454,43 @@ class BPlayer {
     }
 
     /**
+     * 开始寻找时间，保存当前时间
+     */
+    startSeekingTime() {
+        // 保存当前时间用于计算时间差
+        bPlaylist.saveCurrentTime();
+    }
+
+    /**
+     * 根据输入的百分数，调整UI的播放进度（显示popup），但不会作用在音频上
+     * @param percentage 将要设置的播放进度，范围为[0, 100]，可以为小数
+     */
+    seekingTimeAt(percentage) {
+        bPlaylist.seekCurrentSongTo(percentage, true);
+    }
+
+    /**
+     * 根据输入的百分数，更新音频音量
+     * @param percentage 将要设置的音频音量，范围为[0, 100]，可以为小数
+     */
+    seekingVolumeAt(percentage) {
+        this.setVolumeTo(percentage / 100);
+    }
+
+    /**
+     * 结束寻找时间，消去popup，恢复时间显示
+     */
+    finishSeekingTime() {
+        // 退出寻找状态
+        bPlaylist.finishSeeking();
+    }
+
+    /**
      * 根据传入的时间值，跳转至当前歌曲的指定位置，保持原来的播放状态
      * @param second 将要跳转至的时间值，单位为秒，可以是小数
      */
     seekCurrentSongTo(second) {
-        bPlaylist.seekCurrentSongTo(second);
+        bPlaylist.seekCurrentSongTo(second, false);
     }
 
     /**
@@ -501,6 +551,17 @@ class BPlayer {
     togglePlaylistVisibility(visible) {
         bPlaylist.togglePlaylistVisibility(visible);
     }
+
+    // /**
+    //  * 检查传入的寻找目标名称值，若不是预设值之一则抛出错误
+    //  * @param target 将要检查的寻找目标名称值，可选{'time', 'volume'}
+    //  * @param functionName 调用此函数时所在函数的名字
+    //  */
+    // static checkSeekingTarget(target, functionName) {
+    //     if (this.seekingTargetList.indexOf(target) === -1) {
+    //         throw new RangeError(`BPlayer::${functionName}(): 指定的寻找目标名称未定义`);
+    //     }
+    // }
 }
 
 /**
@@ -513,19 +574,121 @@ class BRender {
      * @param e
      */
     constructor(e) {
+        // 音量图标与css样式的映射
         this.volumeIconDict = {
             'mute': 'icomoon-volume-mute2',
             'low': 'icomoon-volume-low',
             'medium': 'icomoon-volume-medium',
             'high': 'icomoon-volume-high'
         }
+        // 循环模式图标与css样式的映射
         this.circulationIconDict = {
             'random': 'icomoon-shuffle',
             'single': 'icomoon-infinite',
             'circulation': 'icomoon-loop',
             'order': 'icomoon-arrow-right2'
         }
-        // TODO: 添加侦听器
+        // 获得歌曲描述，这段文字应该在服务器传来的页面中存在
+        this.description = $description.text();
+        // 记录歌曲描述段落是否被收缩
+        this.isDescriptionCollapsed = false;
+        // 用于收缩和展开歌曲描述段落的节点
+        this.collapseToggleDom = null;
+        // “唱片”的旋转速度
+        this.DISC_ROTATION_SPEED = 0.2;
+        // “唱片”的旋转角度
+        this.discRotation = 0;
+        // 创建this.collapseToggleDom并添加一个侦听器
+        this.createCollapseToggleDom();
+        // 添加窗口尺寸变化的侦听器
+        $(window).resize(function () {
+            const width = window.innerWidth;
+            this.switchButtonText(width);
+            this.switchDescriptionText(width);
+            this.switchDiscStyle(width);
+        })
+        // 旋转“唱片”
+        requestAnimationFrame(() => this.rotateDisc());
+    }
+
+    /**
+     * 创建this.collapseToggleDom并添加一个侦听器
+     */
+    createCollapseToggleDom() {
+        // 用于收缩和展开歌曲描述段落的节点
+        this.collapseToggleDom = $('<a id="collapse-toggle" href="javascript:void(0);" class="collect link">收起</a>');
+        // 向this.collapseToggleDom添加一个侦听器
+        this.collapseToggleDom.click(() => {
+            this.isDescriptionCollapsed = !this.isDescriptionCollapsed;
+            // 复用代码，根据窗口内容区宽度调整歌曲描述段落的长度
+            this.switchDescriptionText(window.innerWidth);
+        })
+    }
+
+    /**
+     * 根据窗口内容区宽度调整按钮区的显示文字
+     * @param width 当前窗口内容区宽度
+     */
+    switchButtonText(width) {
+        if (width < 992) {
+            $text_favorite.text('');
+            $text_download.text('');
+            $text_share.text('');
+        } else {
+            $text_favorite.text('收藏');
+            $text_download.text('下载');
+            $text_share.text('分享');
+        }
+    }
+
+    /**
+     * 根据窗口内容区宽度调整歌曲描述段落的长度，截取过后的描述段落末尾使用`...`来代替剩余文字
+     * @param width 当前窗口内容区宽度
+     */
+    switchDescriptionText(width) {
+        let maxLength;
+        if (width < 992) {
+            maxLength = 30;
+        } else if (width < 1200) {
+            maxLength = 50;
+        } else {
+            maxLength = 70;
+        }
+        // 截取描述段落
+        const descriptionToShow = this.description.substring(0, maxLength);
+        // 显示完整/精简描述
+        $description.html(`${this.isDescriptionCollapsed ? `${descriptionToShow}...` : this.description}　`);
+        // 追加this.collapseToggleDom节点
+        $description.append(this.collapseToggleDom);
+    }
+
+    /**
+     * 根据当前窗口内容区宽度调整“唱片”形态，包括唱片的上边距和磁头的最大旋转角，当音频正在播放时，更新磁头的旋转角度
+     * @param width 当前窗口内容区宽度
+     */
+    switchDiscStyle(width) {
+        if (width < 992) {
+            $disc_group.css('top', '100px');
+            this.needle_rotation_max = 20;
+        } else if (width < 1200) {
+            $disc_group.css('top', '30px');
+            this.needle_rotation_max = -12;
+        } else {
+            $disc_group.css('top', '10px');
+            this.needle_rotation_max = -20;
+        }
+        if (bPlaylist.isPlaying()) {
+            $disc_needle.css(`transform', 'translate(-15.15%, -9.09%) scale(0.25) rotateZ(${this.needle_rotation_max}deg)`);
+        }
+    }
+
+    rotateDisc() {
+        if (bPlaylist.isPlaying()) {
+            this.discRotation = this.discRotation % 360 + this.DISC_ROTATION_SPEED;
+            $disc_cover.css('transform', `scale(0.63) rotate(${this.discRotation}deg)`);
+            $disc_mask.css('transform', `rotate(${this.discRotation}deg)`);
+        }
+        requestAnimationFrame(() => this.rotateDisc());
     }
 
     /**
@@ -561,16 +724,50 @@ class BRender {
      * 根据传入的播放进度百分比，改变播放进度指示器的位置，并为已播放的部分设置样式
      * @param percentage 将要设置的播放进度百分比
      */
-    setTimeIndicator(percentage) {
+    setTimeIndicator(percentage, deltaTime) {
+        $prograss_indicator.css('left', `${percentage}%`);
+        $prograss_played.css('width', `${percentage}%`);
+    }
 
+
+    /**
+     * 打开popup，显示“目标时间/总时长　相差时间”，播放进度条右侧显示相差时间
+     * @param deltaTime 与进入寻找状态时指示器位置的距离差对应的时间，单位为秒，负值表示快退
+     * @param targetTime 目标时间，单位为秒
+     * @param totalTime 总时长，单位为秒
+     */
+    showDeltaTime(deltaTime, targetTime, totalTime) {
+        const targetTimeText = convertTimeFromNumber(targetTime);
+        const totalTimeText = convertTimeFromNumber(totalTime);
+        $total_time.text(targetTimeText).css('color', deltaTime >= 0 ? '#ed2525' : '#4de14d');
+        popup_time.open(
+            `<p class="popup-text">
+            <span class="icomoon-notification icon-message"></span>
+            ${targetTimeText}/${totalTimeText}　${deltaTime > 0 ? `+` : ``}${deltaTime}s
+            </p>`, 'html'
+        );
     }
 
     /**
-     * 根据传入的缓冲进度百分比，设置已缓冲部分的样式
-     * @param percentage 将要设置的缓冲进度百分比
+     * 关闭popup，播放进度条右侧恢复为总时长
+     * @param duration 总时长，应大于0，单位为秒
+     */
+    hideDeltaTime(duration) {
+        $total_time.text(this.convertTimeFromNumber(duration));
+        $total_time.css('color', 'inherit');
+        popup_time.close();
+        window.getSelection().removeAllRanges();
+    }
+
+    /**
+     * 根据传入的缓冲进度百分数，设置已缓冲部分的样式
+     * @param percentage 将要设置的缓冲进度百分数
      */
     setLoadIndicator(percentage) {
-
+        // 检查参数
+        BPlaylist.checkPercentage(percentage, 'setLoadIndicator', this);
+        // 设置样式
+        $prograss_loaded.css('width', `${percentage}%`);
     }
 
     /**
@@ -594,7 +791,6 @@ class BRender {
     setVolumeIcon(type) {
         // 检查参数类型并映射样式
         const value = this.checkVolumeIcon(type, 'setVolumeIcon');
-        this.volumeIconDict[type];
         // 改变样式
         $control_volume.removeClass();
         $control_volume.addClass(value);
@@ -617,7 +813,9 @@ class BRender {
      * @param visible 将要设置的播放列表可见性状态值，应为布尔值
      */
     setPlaylistVisibilityTo(visible) {
+        // 检查参数
         BPlaylist.checkBoolean(visible, 'setPlaylistVisibilityTo', this);
+        // 设置样式
         if (visible) {
             $progress_playlist.css('top', '0');
             $progress_box.css('opacity', '1');
@@ -651,6 +849,8 @@ class BRender {
      * @param playlistItem 将要新增的条目信息
      */
     addItemToPlaylist(playlistItem) {
+        // 检查参数
+
         // 移除“播放列表没有歌曲”占位项
         $playlist_not_exist.remove();
         // 构造条目html
@@ -670,7 +870,7 @@ class BRender {
      * @param num 将要删除的条目编号，列表下第1个子元素的编号为1
      */
     removeItemFromPlaylist(num) {
-
+        // TODO
     }
 
     /**
@@ -690,6 +890,7 @@ class BRender {
     /**
      * 检查传入的音量图标类型值，若不是预设值之一则抛出错误
      * @param type 将要检查的音量图标类型值，可选{'mute', 'low', 'medium', 'high'}
+     * @param functionName 调用此函数时所在函数的名字
      * @return {*} 音量图标类型对应的值
      */
     checkVolumeIcon(type, functionName) {
@@ -704,6 +905,7 @@ class BRender {
     /**
      * 检查传入的循环模式图标类型值，若不是预设值之一则抛出错误
      * @param type 将要检查的循环模式图标类型值，可选{'random', 'single', 'circulation', 'order'}
+     * @param functionName 调用此函数时所在函数的名字
      * @return {*} 循环模式图标类型对应的值
      */
     checkCirculationIcon(mode, functionName) {
@@ -723,5 +925,52 @@ class BRender {
      */
     static addLinkToArtists(artistsList) {
         return artistsList.split('/').map((artist) => '<a href="#">' + artist + '</a>').join('/');
+    }
+
+    /**
+     * 将以秒为单位的时间转换为`MM:SS`格式的时间文本
+     * @param time 将要转换的时间
+     * @return {string}
+     */
+    static convertTimeFromNumber(time) {
+        this.checkNumber(time, 'convertTimeFromNumber', this);
+        time = ~~time;
+        return `${this.addZeroPrefix((~~(time / 60)).toString())}:${this.addZeroPrefix((time % 60).toString())}`;
+    }
+
+    /**
+     * 为长度不足2位的时间值文本添加`0`前缀
+     * @param time
+     * @return {*}
+     */
+    static addZeroPrefix(time) {
+        this.checkString(time, 'addZeroPrefix', this);
+        return time.length < 2 ? `0${time}` : time;
+    }
+
+    /**
+     * 检查传入的参数是否为数字值，若不是则抛出错误
+     * @param num 将要检查的参数值
+     * @param functionName 调用此函数时所在函数的名字
+     * @param thisRef 调用此函数时的上下文，用于获取类名
+     */
+    static checkNumber(num, functionName, thisRef) {
+        thisRef = thisRef || this;
+        if (typeof num !== "number") {
+            throw new TypeError(`${thisRef.constructor.name}::${functionName}(): 参数类型不正确，应为数字值`);
+        }
+    }
+
+    /**
+     * 检查传入的参数是否为字符串，若不是则抛出错误
+     * @param str 将要检查的参数值
+     * @param functionName 调用此函数时所在函数的名字
+     * @param thisRef 调用此函数时的上下文，用于获取类名
+     */
+    static checkString(str, functionName, thisRef) {
+        thisRef = thisRef || this;
+        if (typeof str !== "string") {
+            throw new TypeError(`${thisRef.constructor.name}::${functionName}(): 参数类型不正确，应为字符串`);
+        }
     }
 }
