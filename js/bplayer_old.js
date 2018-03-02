@@ -4,9 +4,8 @@
 
 'use strict';
 
-const bPlaylist = new BPlaylist();
 const bPlayer = new BPlayer();
-const bRender = new BRender();
+const bListener = new BListener();
 
 class MusicInfo {
     constructor(id, title, description, artists, album, url, pic, lrc) {
@@ -30,12 +29,242 @@ class PlaylistItem {
 }
 
 /**
+ * Event Parser
+ * 事件解析器：
+ * 1. 为页面元素添加侦听器，包括window和document
+ * 2. 提供侦听器，对事件进行预处理，包括筛选事件和组装参数
+ * 3. 调用相应的事件处理器，处理事件
+ */
+class BListener {
+    constructor() {
+        // 为页面元素添加侦听器
+        $(window).resize((e)=>{this.onResize(e)});
+        // 添加“上一曲”按钮的侦听器
+        $control_previous.click((e) => {this.onClickControlPrevious(e)});
+        // 添加“下一曲”按钮的侦听器
+        $control_next.click((e) => {this.onClickControlNext(e)});
+        // 添加“播放/暂停”按钮的侦听器
+        $control_toggle.click((e) => {this.onClickControlToggle(e)});
+        // 添加“播放”按钮的侦听器
+        $btn_play.click((e) => {this.onClickBtnPlay(e)});
+    }
+
+    onResize() {
+        bPlayer.onResize();
+    }
+
+    onClickControlPrevious() {
+        bPlayer.onPlayPreviousSong();
+    }
+
+    onClickControlNext() {
+        bPlayer.onPlayNextSong();
+    }
+
+    onClickControlToggle() {
+        bPlayer.onToggleCurrentSong();
+    }
+
+    onClickBtnPlay() {
+        bPlayer.onPlayThisSong();
+    }
+}
+
+/**
+ * Event Handler
+ * 事件处理器：
+ * 1. 提供接口给事件解析器
+ * 2. 更新相应的模型、视图或两者
+ */
+class BPlayer {
+    constructor() {
+        this.bPlaylist = new BPlaylist();
+        this.bRender = new BRender();
+    }
+
+    onResize() {
+        try {
+            this.bRender.resize(this.bPlaylist.resize());
+        } catch (e) {
+            console.error(e);
+        }
+    }
+
+    onPlayThisSong() {
+
+    }
+
+    /**
+     * 根据传入的歌曲信息，向播放列表的末尾添加一首歌曲，暂时不考虑歌曲重复的问题
+     * @param musicInfo 将要传入的歌曲信息
+     */
+    addSongToPlaylist(musicInfo) {
+        this.bPlaylist.addSong(musicInfo);
+    }
+
+    /**
+     * 根据传入的编号值，将播放列表中指定位置的歌曲删除
+     * @param num 将要从播放列表中删除的歌曲的编号值
+     */
+    removeSongFromPlaylist(num) {
+        this.bPlaylist.removeSong(num);
+    }
+
+    /**
+     * 从浏览器的Local Storage读取播放列表并附加到当前播放列表
+     */
+    loadPlaylist() {
+        this.bPlaylist.restorePlaylistFromLocalStorage();
+    }
+
+    /**
+     * 将当前播放列表存储（更新）至浏览器的Local Storage，一般在操作播放列表后执行一次
+     */
+    savePlaylist() {
+        this.bPlaylist.storePlaylistIntoLocalStorge();
+    }
+
+    /**
+     * 播放当前歌曲
+     */
+    playCurrentSong() {
+        this.bPlaylist.playCurrentSong();
+    }
+
+    /**
+     * 根据传入的播放状态，设置播放器到相应的播放状态
+     * @param playing 将要设置的播放状态，应为布尔值或undefined
+     * 若playing值为undefined，将在'playing'和'paused'之间来回切换
+     */
+    onToggleCurrentSong(playing) {
+        this.bPlaylist.toggleCurrentSong(playing);
+    }
+
+    /**
+     * 开始寻找时间，保存当前时间
+     */
+    startSeekingTime() {
+        // 保存当前时间用于计算时间差
+        this.bPlaylist.saveCurrentTime();
+    }
+
+    /**
+     * 根据输入的百分数，调整UI的播放进度（显示popup），但不会作用在音频上
+     * @param percentage 将要设置的播放进度，范围为[0, 100]，可以为小数
+     */
+    seekingTimeAt(percentage) {
+        this.bPlaylist.seekCurrentSongTo(percentage, true);
+    }
+
+    /**
+     * 根据输入的百分数，更新音频音量
+     * @param percentage 将要设置的音频音量，范围为[0, 100]，可以为小数
+     */
+    seekingVolumeAt(percentage) {
+        this.setVolumeTo(percentage / 100);
+    }
+
+    /**
+     * 结束寻找时间，消去popup，恢复时间显示
+     */
+    finishSeekingTime() {
+        // 退出寻找状态
+        this.bPlaylist.finishSeeking();
+    }
+
+    /**
+     * 根据传入的时间值，跳转至当前歌曲的指定位置，保持原来的播放状态
+     * @param second 将要跳转至的时间值，单位为秒，可以是小数
+     */
+    seekCurrentSongTo(second) {
+        this.bPlaylist.seekCurrentSongTo(second, false);
+    }
+
+    /**
+     * 暂停当前播放的歌曲
+     */
+    pauseCurrentSong() {
+        this.bPlaylist.pauseCurrentSong();
+    }
+
+    /**
+     * 从播放列表中选择上一曲播放，若已为第一首，选择最后一首播放
+     */
+    onPlayPreviousSong() {
+        try {
+            this.bRender.playPreviousSong(this.bPlaylist.playPreviousSong());
+        } catch (e) {
+            console.error(e);
+        }
+    }
+
+    /**
+     * 从播放列表中选择下一曲播放，若已为最后一首，选择第一首播放
+     */
+    onPlayNextSong() {
+        try {
+            this.bPlaylist.playNextSong();
+        } catch (e) {
+            console.error(e);
+        }
+    }
+
+    /**
+     * 设置音量值
+     * @param volume 将要设置的音量值，范围为[0, 1]
+     */
+    setVolumeTo(volume) {
+        this.bPlaylist.setVolumeTo(volume);
+    }
+
+    /**
+     * 进入静音状态
+     */
+    saveVolumeAndMute() {
+        this.bPlaylist.storeVolumeAndMute();
+    }
+
+    /**
+     * 从静音状态恢复
+     */
+    loadVolumeFromMute() {
+        this.bPlaylist.restoreVolumeFromMute();
+    }
+
+    /**
+     * 轮换循环模式
+     */
+    toggleCirculation() {
+        this.bPlaylist.toggleCirculation();
+    }
+
+    /**
+     * 根据传入的播放列表可见性，设置播放列表到相应的显示状态
+     * @param visible 将要设置的播放列表可见性状态值，应为布尔值或undefined
+     * 若visible值为undefined，将在'visible'和'hidden'之间来回切换
+     */
+    togglePlaylistVisibility(visible) {
+        this.bPlaylist.togglePlaylistVisibility(visible);
+    }
+
+    // /**
+    //  * 检查传入的寻找目标名称值，若不是预设值之一则抛出错误
+    //  * @param target 将要检查的寻找目标名称值，可选{'time', 'volume'}
+    //  * @param functionName 调用此函数时所在函数的名字
+    //  */
+    // static checkSeekingTarget(target, functionName) {
+    //     if (this.seekingTargetList.indexOf(target) === -1) {
+    //         throw new RangeError(`BPlayer::${functionName}(): 指定的寻找目标名称未定义`);
+    //     }
+    // }
+}
+
+/**
  * Model
  * 数据模型：
  * 1. 包含播放列表、音量和循环模式等状态
  * 2. 响应状态查询
  * 3. 执行功能
- * 4. 通知View改变
  */
 class BPlaylist {
     constructor() {
@@ -47,6 +276,10 @@ class BPlaylist {
         this.volumeBeforeMute = 0;
         this.currentSong = 1;
         this.savedTime = 0;
+    }
+
+    resize() {
+
     }
 
     /**
@@ -396,177 +629,9 @@ class BPlaylist {
 }
 
 /**
- * Controller
- * “播放列表”和视图的控制器：
- * 1. 将用户请求转换为模型的改变
- * 2. 选择响应的视图
- */
-class BPlayer {
-    constructor() {
-        this.seekingTargetList = ['time', 'volume'];
-        this.seekingTarget = null;
-    }
-
-    /**
-     * 根据传入的歌曲信息，向播放列表的末尾添加一首歌曲，暂时不考虑歌曲重复的问题
-     * @param musicInfo 将要传入的歌曲信息
-     */
-    addSongToPlaylist(musicInfo) {
-        bPlaylist.addSong(musicInfo);
-    }
-
-    /**
-     * 根据传入的编号值，将播放列表中指定位置的歌曲删除
-     * @param num 将要从播放列表中删除的歌曲的编号值
-     */
-    removeSongFromPlaylist(num) {
-        bPlaylist.removeSong(num);
-    }
-
-    /**
-     * 从浏览器的Local Storage读取播放列表并附加到当前播放列表
-     */
-    loadPlaylist() {
-        bPlaylist.restorePlaylistFromLocalStorage();
-    }
-
-    /**
-     * 将当前播放列表存储（更新）至浏览器的Local Storage，一般在操作播放列表后执行一次
-     */
-    savePlaylist() {
-        bPlaylist.storePlaylistIntoLocalStorge();
-    }
-
-    /**
-     * 播放当前歌曲
-     */
-    playCurrentSong() {
-        bPlaylist.playCurrentSong();
-    }
-
-    /**
-     * 根据传入的播放状态，设置播放器到相应的播放状态
-     * @param playing 将要设置的播放状态，应为布尔值或undefined
-     * 若playing值为undefined，将在'playing'和'paused'之间来回切换
-     */
-    toggleCurrentSong(playing) {
-        bPlaylist.toggleCurrentSong(playing);
-    }
-
-    /**
-     * 开始寻找时间，保存当前时间
-     */
-    startSeekingTime() {
-        // 保存当前时间用于计算时间差
-        bPlaylist.saveCurrentTime();
-    }
-
-    /**
-     * 根据输入的百分数，调整UI的播放进度（显示popup），但不会作用在音频上
-     * @param percentage 将要设置的播放进度，范围为[0, 100]，可以为小数
-     */
-    seekingTimeAt(percentage) {
-        bPlaylist.seekCurrentSongTo(percentage, true);
-    }
-
-    /**
-     * 根据输入的百分数，更新音频音量
-     * @param percentage 将要设置的音频音量，范围为[0, 100]，可以为小数
-     */
-    seekingVolumeAt(percentage) {
-        this.setVolumeTo(percentage / 100);
-    }
-
-    /**
-     * 结束寻找时间，消去popup，恢复时间显示
-     */
-    finishSeekingTime() {
-        // 退出寻找状态
-        bPlaylist.finishSeeking();
-    }
-
-    /**
-     * 根据传入的时间值，跳转至当前歌曲的指定位置，保持原来的播放状态
-     * @param second 将要跳转至的时间值，单位为秒，可以是小数
-     */
-    seekCurrentSongTo(second) {
-        bPlaylist.seekCurrentSongTo(second, false);
-    }
-
-    /**
-     * 暂停当前播放的歌曲
-     */
-    pauseCurrentSong() {
-        bPlaylist.pauseCurrentSong();
-    }
-
-    /**
-     * 从播放列表中选择上一曲播放，若已为第一首，选择最后一首播放
-     */
-    playPreviousSong() {
-        bPlaylist.playPreviousSong();
-    }
-
-    /**
-     * 从播放列表中选择下一曲播放，若已为最后一首，选择第一首播放
-     */
-    playNextSong() {
-        bPlaylist.playNextSong();
-    }
-
-    /**
-     * 设置音量值
-     * @param volume 将要设置的音量值，范围为[0, 1]
-     */
-    setVolumeTo(volume) {
-        bPlaylist.setVolumeTo(volume);
-    }
-
-    /**
-     * 进入静音状态
-     */
-    saveVolumeAndMute() {
-        bPlaylist.storeVolumeAndMute();
-    }
-
-    /**
-     * 从静音状态恢复
-     */
-    loadVolumeFromMute() {
-        bPlaylist.restoreVolumeFromMute();
-    }
-
-    /**
-     * 轮换循环模式
-     */
-    toggleCirculation() {
-        bPlaylist.toggleCirculation();
-    }
-
-    /**
-     * 根据传入的播放列表可见性，设置播放列表到相应的显示状态
-     * @param visible 将要设置的播放列表可见性状态值，应为布尔值或undefined
-     * 若visible值为undefined，将在'visible'和'hidden'之间来回切换
-     */
-    togglePlaylistVisibility(visible) {
-        bPlaylist.togglePlaylistVisibility(visible);
-    }
-
-    // /**
-    //  * 检查传入的寻找目标名称值，若不是预设值之一则抛出错误
-    //  * @param target 将要检查的寻找目标名称值，可选{'time', 'volume'}
-    //  * @param functionName 调用此函数时所在函数的名字
-    //  */
-    // static checkSeekingTarget(target, functionName) {
-    //     if (this.seekingTargetList.indexOf(target) === -1) {
-    //         throw new RangeError(`BPlayer::${functionName}(): 指定的寻找目标名称未定义`);
-    //     }
-    // }
-}
-
-/**
  * View
- * 渲染部分，在UI上绑定事件，这些事件会导致播放器状态的改变，并且反过来更新UI
+ * 渲染部分：
+ * 1. 提供渲染接口，用于更新UI
  */
 class BRender {
     /**
@@ -598,31 +663,122 @@ class BRender {
         this.DISC_ROTATION_SPEED = 0.2;
         // “唱片”的旋转角度
         this.discRotation = 0;
-        // 创建this.collapseToggleDom并添加一个侦听器
-        this.createCollapseToggleDom();
-        // 添加窗口尺寸变化的侦听器
-        $(window).resize(function () {
-            const width = window.innerWidth;
-            this.switchButtonText(width);
-            this.switchDescriptionText(width);
-            this.switchDiscStyle(width);
-        })
+        // 弹窗对象，在寻找时间时显示，不自动消失
+        this.popup_time = null;
+        // 弹窗对象，在显示普通信息时显示，0.5s后自动消失
+        this.popup_message = null;
+        // 剪贴板对象，绑定到“分享”标签
+        this.clipboard = null;
+        // 创建页面元素
+        this.createDom();
         // 旋转“唱片”
         requestAnimationFrame(() => this.rotateDisc());
     }
 
+    resize() {
+        const width = window.innerWidth;
+        this.switchButtonText(width);
+        this.switchDescriptionText(width);
+        this.switchDiscStyle(width);
+    }
+
     /**
-     * 创建this.collapseToggleDom并添加一个侦听器
+     * 创建页面元素
      */
-    createCollapseToggleDom() {
-        // 用于收缩和展开歌曲描述段落的节点
+    createDom() {
+        // 创建用于收缩和展开歌曲描述段落的节点
         this.collapseToggleDom = $('<a id="collapse-toggle" href="javascript:void(0);" class="collect link">收起</a>');
-        // 向this.collapseToggleDom添加一个侦听器
+        // 创建弹窗对象
+        this.createPopup();
+        // 创建剪贴板对象
+        this.createClipboard();
+    }
+
+    /**
+     * 创建弹窗对象
+     */
+    createPopup() {
+        // 弹窗对象，在寻找时间时显示，不自动消失
+        this.popup_time = new $.Popup({
+            speed: 500,
+            closeContent: '',
+            preloaderContent: '',
+            containerClass: "popup-message"
+        });
+        // 弹窗对象，在显示普通信息时显示，0.5s后自动消失
+        this.popup_message = new $.Popup({
+            speed: 500,
+            closeContent: '',
+            preloaderContent: '',
+            containerClass: "popup-message",
+            afterOpen: function () {
+                // 原本使用的是let
+                const popup = this;
+                setTimeout(function () {
+                    popup.close();
+                }, 500);
+            }
+        });
+    }
+
+    /**
+     * 创建剪贴板对象
+     */
+    createClipboard() {
+        // 剪贴板对象，绑定到“分享”标签
+        this.clipboard = new Clipboard('#btn-share', {
+            text: function () {
+                return location['href'];
+            }
+        });
+    }
+
+    /**
+     * 为页面元素添加侦听器
+     */
+    addEventListener() {
+        // 向this.collapseToggleDom添加侦听器
         this.collapseToggleDom.click(() => {
             this.isDescriptionCollapsed = !this.isDescriptionCollapsed;
             // 复用代码，根据窗口内容区宽度调整歌曲描述段落的长度
             this.switchDescriptionText(window.innerWidth);
         })
+        // 添加“添加至播放列表”按钮的侦听器
+        $btn_add.click(() => {
+            // TODO
+        });
+        // 添加“收藏到歌单”按钮的侦听器
+        $btn_favorite.click(() => {
+            // TODO
+        });
+        // 添加“下载”按钮的侦听器
+        $btn_download.click(() => {
+            // TODO
+        });
+        // 添加剪贴板对象的侦听器
+        this.clipboard.on('success', (e) => {
+            popup_message.open(
+                `<p class="popup-text">
+                <span class="icomoon-notification icon-message"></span>
+                本页URL已复制到剪贴板>_<
+                </p>`
+                , 'html'
+            );
+            e.clearSelection();
+        });
+        this.clipboard.on('error', (e) => {
+            console.error('Action:', e.action);
+            console.error('Trigger:', e.trigger);
+            popup_message.open(
+                `<p class="popup-text">
+                <span class="icomoon-cancel-circle icon-message"></span>
+                访问剪贴板失败>_<
+                <br />
+                请使用Ctrl + C手动复制
+                </p>`
+                , 'html'
+            );
+        });
     }
 
     /**
@@ -682,12 +838,22 @@ class BRender {
         }
     }
 
+    /**
+     * 旋转“唱片”时调用的动画方法
+     */
     rotateDisc() {
+        if (this.constructor.name !== 'BRender') {
+            throw new Error('BRender::rotateDisc(): this绑定错误');
+        }
+        // 仅当音频正在播放时旋转
         if (bPlaylist.isPlaying()) {
+            // 加上旋转增量
             this.discRotation = this.discRotation % 360 + this.DISC_ROTATION_SPEED;
+            // 设置样式
             $disc_cover.css('transform', `scale(0.63) rotate(${this.discRotation}deg)`);
             $disc_mask.css('transform', `rotate(${this.discRotation}deg)`);
         }
+        // 请求下一动画帧，函数内的this可能指向不正确
         requestAnimationFrame(() => this.rotateDisc());
     }
 
@@ -701,7 +867,7 @@ class BRender {
         BPlaylist.checkBoolean(playing, 'setPlayingstatusTo', this);
 
         function toggleCurrentSong() {
-            bPlayer.toggleCurrentSong();
+            bPlayer.onToggleCurrentSong();
         }
 
         // 设置唱片样式
@@ -812,6 +978,7 @@ class BRender {
      * 根据传入的播放列表可见性状态值，设置一系列样式，改变播放列表可见性
      * @param visible 将要设置的播放列表可见性状态值，应为布尔值
      */
+    // TODO: 去除getPlaylistCount()
     setPlaylistVisibilityTo(visible) {
         // 检查参数
         BPlaylist.checkBoolean(visible, 'setPlaylistVisibilityTo', this);
@@ -828,7 +995,7 @@ class BRender {
             // 获取播放列表中的歌曲数
             const playlistCount = bPlaylist.getPlaylistCount();
             // 计算所需高度
-            let value = `${1.25 + (playlistCount || 1) * 2.25}rem`;
+            const value = `${1.25 + (playlistCount || 1) * 2.25}rem`;
             // 改变样式
             $player_container.css('height', value);
         }
