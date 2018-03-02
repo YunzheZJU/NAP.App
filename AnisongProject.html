@@ -53,14 +53,14 @@
     <div id="bg-image-container col-12">
         <div class="container">
             <div class="col-12">
-                <img id="bg-image" src="">
+                <img id="bg-image" src="http://api.anisong.niconi.cc/image/girlslasttourED.jpg">
             </div>
         </div>
     </div>
     <div class="col-6 px-0">
         <div class="container no-gutters">
             <div id="disc-group" class="col-12">
-                <img id="disc-cover" src="image/disc_default.png"/>
+                <img id="disc-cover" src="http://api.anisong.niconi.cc/image/girlslasttourED.jpg"/>
                 <img id="disc-mask" src="image/disc_mask.png"/>
                 <img id="disc-light" src="image/disc_light.png"/>
                 <img id="disc-play" src="image/disc_play.png"/>
@@ -82,10 +82,15 @@
              data-offset="-55%"
              data-template='<div class="tooltip" role="tooltip"><div class="arrow"></div><div class="tooltip-inner title-tooltip"></div></div>'
              title="Uploader: 絢瀬絵里">
-            動く、動く
+            雨だれの歌
         </div>
-        <div id="description" class="mr-4">
-            新潮社のWEBコミックサイト『くらげバンチ』にて連載の人気コミック『少女終末旅行』がTVアニメ化。終末の世界を旅する少女2人、水瀬いのり演じるチトと、久保ユリカ演じるユーリの人気声優による、オープニング・テーマがリリース!
+        <div id="description" class="mr-4" data-is-collected="true">
+            <span id="description-text">
+                新潮社のWEBコミックサイト『くらげバンチ』にて連載の人気コミック『少女終末旅行』がTVアニメ化。終末の世界を旅する少女2人、水瀬いのり演じるチトと、久保ユリカ演じるユーリの人気声優による、オープニング・テーマがリリース!
+            </span>
+            <span>　</span>
+            <span id="collapse-toggle" class="link collect unselectable">展开</span>
+
         </div>
         <div class="container mt-1 mt-lg-2 mt-xl-3 mx-xl-5 mx-lg-2">
             <div class="row unselectable">
@@ -127,7 +132,7 @@
                             所属专辑
                         </th>
                         <td>
-                            <a id="album" href="#" class="link">TVアニメ「少女終末旅行」オープニングテーマ「動く、動く」</a>
+                            <a id="album" href="#" class="link">TVアニメ「少女終末旅行」エンディングテーマ「More One Night」</a>
                             <a href="http://www.nexushd.org" target="_blank" class="float-right">
                                 <span class="oi oi-external-link external"></span>
                             </a>
@@ -162,9 +167,6 @@
                         </td>
                     </tr>
                 </table>
-                <!--<div id="lyric" class="minh">-->
-                <!--暂无歌词-->
-                <!--</div>-->
             </div>
             <div class="icon-report mr-0 float-right" data-toggle="tooltip" data-placement="top" title="信息有误？">
                 <a href="#" class="">R</a>
@@ -188,7 +190,7 @@
             <span id="control-board" class="icomoon-linkedin"></span>
         </div>
     </div>
-    <audio controls="controls" id="bplayer"></audio>
+    <audio controls="controls" id="bplayer" src="http://api.anisong.niconi.cc/file/7.m4a"></audio>
 </div>
 <div id="player" class="aplayer mx-auto" style="display: none"></div>
 <div id="player-container" class="container-fluid no-gutters px-0">
@@ -249,7 +251,7 @@
                 <div class="container-fluid px-0 d-flex" style="height:3.5rem;">
                     <div class="col-2 px-0 ml-4 ml-md-4 ml-lg-3 ml-xl-3 mr-0 mr-lg-1 mr-xl-2">
                         <p class="text-center">
-                            <span id="control-volume" class="icomoon-volume-medium"></span>
+                            <span id="control-volume" class="icomoon-volume-high"></span>
                         </p>
                     </div>
                     <div class="col-3 col-md-4 col-lg-6 ml-2 ml-lg-0 px-0">
@@ -280,63 +282,6 @@
         </div>
     </div>
 </div>
-<!--<div id="player-playlist">-->
-    <!--<div id="playlist-banner">-->
-        <!--<div class="container px-0 unselectable">-->
-            <!--<div class="row no-gutters">-->
-                <!--<div id="playlist-count" class="col-7 my-2 px-3">-->
-                    <!--共<span id="playlist-count-number">0</span>首-->
-                <!--</div>-->
-                <!--<div id="playlist-clear" class="col-2 ml-auto my-2 px-1">-->
-                    <!--<span id="icon-clear" class="icomoon-bin mx-1"></span>清空-->
-                <!--</div>-->
-            <!--</div>-->
-        <!--</div>-->
-    <!--</div>-->
-    <!--<div id="playlist-container">-->
-        <!--<p id="playlist-not-exist" class="text-center mb-0">还没有添加任何歌曲</p>-->
-        <!--<ol id="playlist-list">-->
-            <!--&lt;!&ndash;<li class="playlist-item active">&ndash;&gt;-->
-                <!--&lt;!&ndash;<div class="container px-0">&ndash;&gt;-->
-                    <!--&lt;!&ndash;<div class="row no-gutters">&ndash;&gt;-->
-                        <!--&lt;!&ndash;<div class="col-7 playlist-title px-2">&ndash;&gt;-->
-                            <!--&lt;!&ndash;<a href="#">&ndash;&gt;-->
-                                <!--&lt;!&ndash;動く、動く&ndash;&gt;-->
-                            <!--&lt;!&ndash;</a>&ndash;&gt;-->
-                        <!--&lt;!&ndash;</div>&ndash;&gt;-->
-                        <!--&lt;!&ndash;<div class="col-3 playlist-artist px-1">&ndash;&gt;-->
-                            <!--&lt;!&ndash;<a href="#">チト</a>&ndash;&gt;-->
-                            <!--&lt;!&ndash;/&ndash;&gt;-->
-                            <!--&lt;!&ndash;<a href="#">ユーリ</a>&ndash;&gt;-->
-                        <!--&lt;!&ndash;</div>&ndash;&gt;-->
-                        <!--&lt;!&ndash;<div class="col-2 playlist-duration px-2">&ndash;&gt;-->
-                            <!--&lt;!&ndash;04:36&ndash;&gt;-->
-                        <!--&lt;!&ndash;</div>&ndash;&gt;-->
-                    <!--&lt;!&ndash;</div>&ndash;&gt;-->
-                <!--&lt;!&ndash;</div>&ndash;&gt;-->
-            <!--&lt;!&ndash;</li>&ndash;&gt;-->
-            <!--&lt;!&ndash;<li class="playlist-item">&ndash;&gt;-->
-                <!--&lt;!&ndash;<div class="container px-0">&ndash;&gt;-->
-                    <!--&lt;!&ndash;<div class="row no-gutters">&ndash;&gt;-->
-                        <!--&lt;!&ndash;<div class="col-7 playlist-title px-2">&ndash;&gt;-->
-                            <!--&lt;!&ndash;<a href="#">&ndash;&gt;-->
-                                <!--&lt;!&ndash;動く、動く&ndash;&gt;-->
-                            <!--&lt;!&ndash;</a>&ndash;&gt;-->
-                        <!--&lt;!&ndash;</div>&ndash;&gt;-->
-                        <!--&lt;!&ndash;<div class="col-3 playlist-artist px-1">&ndash;&gt;-->
-                            <!--&lt;!&ndash;<a href="#">チト</a>&ndash;&gt;-->
-                            <!--&lt;!&ndash;/&ndash;&gt;-->
-                            <!--&lt;!&ndash;<a href="#">ユーリ</a>&ndash;&gt;-->
-                        <!--&lt;!&ndash;</div>&ndash;&gt;-->
-                        <!--&lt;!&ndash;<div class="col-2 playlist-duration px-2">&ndash;&gt;-->
-                            <!--&lt;!&ndash;04:36&ndash;&gt;-->
-                        <!--&lt;!&ndash;</div>&ndash;&gt;-->
-                    <!--&lt;!&ndash;</div>&ndash;&gt;-->
-                <!--&lt;!&ndash;</div>&ndash;&gt;-->
-            <!--&lt;!&ndash;</li>&ndash;&gt;-->
-        <!--</ol>-->
-    <!--</div>-->
-<!--</div>-->
 <script type="text/javascript" src="include/jquery.js"></script>
 <script type="text/javascript" src="include/popper.js"></script>
 <script type="text/javascript" src="include/jquery.popup.js"></script>
@@ -344,6 +289,13 @@
 <script type="text/javascript" src="include/APlayer.min.js"></script>
 <script type="text/javascript" src="include/clipboard.js"></script>
 <script type="text/javascript" src="include/lyrics.js"></script>
-<script type="text/javascript" src="js/script.js"></script>
+<script type="text/javascript" src="js/bplaylist.js"></script>
+<script type="text/javascript" src="js/brender.js"></script>
+<script type="text/javascript" src="js/bplayer.js"></script>
+<script type="text/javascript" src="js/blistener.js"></script>
+<script>
+    const bPlayer = new BPlayer();
+    const bListener = new BListener();
+</script>
 </body>
 </html>
