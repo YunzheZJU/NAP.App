@@ -69,7 +69,7 @@ class BPlayer {
 
     onPlayCurrentSong() {
         try {
-            this.bRender.setPlayingStatusTo(this.bPlaylist.playCurrentSong());
+            this.bRender.setPlayingStatus(this.bPlaylist.playCurrentSong());
         } catch (e) {
             console.error(e);
         }
@@ -77,7 +77,7 @@ class BPlayer {
 
     onPauseCurrentSong() {
         try {
-            this.bRender.setPlayingStatusTo(this.bPlaylist.pauseCurrentSong());
+            this.bRender.setPlayingStatus(this.bPlaylist.pauseCurrentSong());
         } catch (e) {
             console.error(e);
         }
@@ -126,6 +126,118 @@ class BPlayer {
     onLeaveMute() {
         try {
             this.bRender.setVolume(this.bPlaylist.restoreVolumeFromMute());
+        } catch (e) {
+            console.error(e);
+        }
+    }
+
+    onSetCirculation(mode) {
+        try {
+            this.bRender.setCirculation(this.bPlaylist.setCirculation(mode));
+        } catch (e) {
+            console.error(e);
+        }
+    }
+
+    onShowPlaylist() {
+        try {
+            this.bRender.showPlaylist(this.bPlaylist.showPlaylist());
+        } catch (e) {
+            console.error(e);
+        }
+    }
+
+    onHidePlaylist() {
+        try {
+            this.bRender.hidePlaylist(this.bPlaylist.hidePlaylist());
+        } catch (e) {
+            console.error(e);
+        }
+    }
+
+    onUpdateTime() {
+        try {
+            this.bRender.setTime(this.bPlaylist.updateTime(), this.bPlaylist.getLoaded(), this.bPlaylist.getDuration());
+        } catch (e) {
+            console.error(e);
+        }
+    }
+
+    onStartSeekingTime() {
+        try {
+            this.bRender.startSeekingTime(this.bPlaylist.startSeekingTime());
+        } catch (e) {
+            console.error(e);
+        }
+    }
+
+    onSeekingTime(delta) {
+        try {
+            this.bRender.seekingTime(this.bPlaylist.seekingTime(delta));
+        } catch (e) {
+            console.error(e);
+        }
+    }
+
+    onEndSeekingTime(delta) {
+        try {
+            this.bRender.endSeekingTime(this.bPlaylist.endSeekingTime(delta));
+        } catch (e) {
+            console.error(e);
+        }
+    }
+
+    onStartSeekingVolume() {
+        try {
+            this.bRender.startSeekingVolume(this.bPlaylist.startSeekingVolume());
+        } catch (e) {
+            console.error(e);
+        }
+    }
+
+    onSeekingVolume(delta) {
+        try {
+            this.bRender.seekingVolume(this.bPlaylist.seekingVolume(delta));
+        } catch (e) {
+            console.error(e);
+        }
+    }
+
+    onEndSeekingVolume() {
+        try {
+            this.bRender.endSeekingVolume(this.bPlaylist.endSeekingVolume());
+        } catch (e) {
+            console.error(e);
+        }
+    }
+
+    onSetTime(percentage) {
+        try {
+            this.bRender.setTime(this.bPlaylist.setTime(percentage), this.bPlaylist.getLoaded(), this.bPlaylist.getDuration());
+        } catch (e) {
+            console.error(e);
+        }
+    }
+
+    onSetVolume(percentage) {
+        try {
+            this.bRender.setVolume(this.bPlaylist.setVolume(percentage));
+        } catch (e) {
+            console.error(e);
+        }
+    }
+
+    addToFavorite() {
+        try {
+            this.bRender.addToFavorite(this.bPlaylist.addToFavorite());
+        } catch (e) {
+            console.error(e);
+        }
+    }
+
+    downloadCurrentSong(url) {
+        try {
+            this.bRender.downloadCurrentSong(this.bPlaylist.downloadCurrentSong(url));
         } catch (e) {
             console.error(e);
         }

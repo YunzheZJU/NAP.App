@@ -15,12 +15,11 @@ class BPlaylist {
     constructor() {
         this.playlist = [];
         this.audio = $('#bplayer')[0];
-        this.isPlaylistVisible = false;
         this.circulationMode = 3;
         this.circulationModeDict = {1: 'random', 2: 'single', 3: 'circulation', 4: 'order'};
-        this.volumeBeforeMute = null;
         this.currentSong = 1;
-        this.savedTime = 0;
+        this.timeBeforeSeeking = 0;
+        this.volumeBeforeSeeking = 0;
     }
 
     /**
@@ -110,25 +109,99 @@ class BPlaylist {
      * 进入静音状态并存储静音前的音量值
      */
     storeVolumeAndMute() {
-        if (this.volumeBeforeMute === null) {
-            this.volumeBeforeMute = this.audio.volume;
-            return 0;
-        } else {
-            throw new TypeError('BPlaylist::restoreVolumeFromMute(): 未退出静音状态时无法进入静音状态');
-        }
+        this.audio.muted = true;
+        return 0;
     }
 
     /**
      * 读取静音前的音量值并从静音状态恢复
      */
     restoreVolumeFromMute() {
-        if (this.volumeBeforeMute) {
-            this.audio.volume = this.volumeBeforeMute;
-            this.volumeBeforeMute = null;
-            return this.audio.volume;
-        } else {
-            throw new TypeError('BPlaylist::restoreVolumeFromMute(): 未进入静音状态时无法从静音状态恢复');
-        }
+        this.audio.muted = false;
+        return this.audio.volume;
+    }
+
+    setCirculation(mode) {
+        this.circulationMode = mode;
+        return this.circulationModeDict[this.circulationMode];
+    }
+
+    showPlaylist() {
+        return this.playlist.length;
+    }
+
+    hidePlaylist() {
+
+    }
+
+    updateTime() {
+        return this.audio.currentTime / this.audio.duration * 100;
+    }
+
+    getDuration() {
+        return this.audio.duration;
+    }
+
+    getLoaded() {
+        return this.audio.buffered.end(this.audio.buffered.length - 1) / this.audio.duration * 100
+    }
+
+    startSeekingTime() {
+        this.timeBeforeSeeking = this.audio.currentTime;
+    }
+
+    seekingTime(delta) {
+        const totalTime = this.audio.duration;
+        const deltaTime = delta * totalTime;
+        let targetTime = this.timeBeforeSeeking + deltaTime;
+        targetTime = targetTime < 0 ? 0 : (targetTime > totalTime ? totalTime : targetTime);
+        return [targetTime, totalTime, targetTime - this.timeBeforeSeeking];
+    }
+
+    endSeekingTime(delta) {
+        // 设置播放时间，最好是整数
+        this.audio.currentTime = ~~(this.seekingTime(delta)[0]);
+        return this.audio.duration;
+    }
+
+    startSeekingVolume() {
+        this.volumeBeforeSeeking = this.audio.volume;
+    }
+
+    seekingVolume(delta) {
+        const deltaVolume = delta * 1;
+        let targetVolume = this.volumeBeforeSeeking + deltaVolume;
+        targetVolume = targetVolume < 0 ? 0 : (targetVolume > 1 ? 1 : targetVolume);
+        this.audio.volume = targetVolume;
+        return targetVolume;
+    }
+
+    endSeekingVolume() {
+
+    }
+
+    setTime(percentage) {
+        // 检查参数
+        BPlaylist.checkPercentage(percentage, 'setTime', this);
+        const targetTime = percentage * this.audio.duration / 100;
+        this.audio.currentTime = targetTime;
+        return targetTime / this.audio.duration * 100;
+    }
+
+    setVolume(percentage) {
+        // 检查参数
+        BPlaylist.checkPercentage(percentage, 'setVolume', this);
+        const volume = percentage / 100;
+        this.audio.volume = volume;
+        return volume;
+    }
+
+    addToFavorite() {
+
+    }
+
+    downloadCurrentSong(url) {
+        window.open(url);
     }
 
     /**

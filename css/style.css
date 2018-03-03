@@ -280,6 +280,56 @@ a:hover {
     cursor: pointer;
 }
 
+@-webkit-keyframes disc-cover-rotate-keyframe {
+    from {
+        transform: scale(0.63) rotate(0deg);
+    }
+    to {
+        transform: scale(0.63) rotate(360deg);
+    }
+}
+
+@keyframes disc-cover-rotate-keyframe {
+    from {
+        transform: scale(0.63) rotate(0deg);
+    }
+    to {
+        transform: scale(0.63) rotate(360deg);
+    }
+}
+
+.disc-cover-animated {
+    -webkit-animation: disc-cover-rotate-keyframe 60s linear infinite;
+    animation: disc-cover-rotate-keyframe 60s linear infinite;
+}
+
+@-webkit-keyframes disc-mask-rotate-keyframe {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes disc-mask-rotate-keyframe {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.disc-mask-animated {
+    -webkit-animation: disc-mask-rotate-keyframe 60s linear infinite;
+    animation: disc-mask-rotate-keyframe 60s linear infinite;
+}
+
+.animation-paused {
+     animation-play-state: paused;
+ }
+
 .unselectable {
     -webkit-user-select: none;
     -moz-user-select: none;
@@ -815,6 +865,7 @@ hr {
     height: 4px;
     position: absolute;
     background-color: #cccccc !important;
+    transition: width 1s ease;
 }
 
 #progress-played {
