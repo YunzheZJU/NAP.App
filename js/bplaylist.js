@@ -22,6 +22,10 @@ class BPlaylist {
         this.volumeBeforeSeeking = 0;
     }
 
+    initPlayer() {
+        return this.restorePlaylistFromLocalStorage();
+    }
+
     /**
      * 响应窗口尺寸变化
      * @return {boolean} 返回音频是否正在播放
@@ -183,7 +187,7 @@ class BPlaylist {
     setTime(percentage) {
         // 检查参数
         BPlaylist.checkPercentage(percentage, 'setTime', this);
-        const targetTime = percentage * this.audio.duration / 100;
+        const targetTime = ~~(percentage * this.audio.duration / 100);
         this.audio.currentTime = targetTime;
         return targetTime / this.audio.duration * 100;
     }
@@ -196,12 +200,92 @@ class BPlaylist {
         return volume;
     }
 
+    playNow() {
+        this.audio.src = `http://api.anisong.online${this.currentSongInfo['fileUrl']}`;
+    }
+
+    addToPlaylist(item) {
+        const result = this.findCurrentSongInPlaylist(item);
+        if (result) {
+            return result;
+        } else {
+            const newItem = item ? item : {
+                num: this.playlist.length + 1,
+                id: ~~this.currentSongInfo['id'],
+                title: this.currentSongInfo['title'],
+                artist: BRender.makeUpArtists(this.currentSongInfo['simpleArtistInfos']),
+                duration: ~~this.currentSongInfo['duration'] / 1000
+            };
+            this.playlist.push(newItem);
+            if (!item) {
+                this.storePlaylistIntoLocalStorge();
+            }
+            return newItem;
+        }
+    }
+
+    findCurrentSongInPlaylist(item) {
+        let songInfo = item ? item : this.currentSongInfo;
+        let i;
+        for (i = 1; i <= this.playlist.length; i++) {
+            if (this.playlist[i - 1].id === ~~songInfo['id']) {
+                return i;
+            }
+        }
+        return 0;
+    }
+
     addToFavorite() {
 
     }
 
-    downloadCurrentSong(url) {
-        window.open(url);
+    downloadCurrentSong() {
+        return this.audio.src;
+    }
+
+    clipboardSuccess(e) {
+        return e;
+    }
+
+    clipboardError(e) {
+        return e;
+    }
+
+
+    setSongInfo(musicInfo) {
+        this.currentSongInfo = musicInfo;
+        if (!this.audio.currentSrc) {
+            this.audio.src = `http://api.anisong.online${this.currentSongInfo['fileUrl']}`;
+        }
+        return musicInfo;
+    }
+
+    updateTag() {
+
+    }
+
+    setBoard(mode) {
+        return mode;
+    }
+
+    /**
+     * 从浏览器的Local Storage读取播放列表并附加到当前播放列表
+     */
+    restorePlaylistFromLocalStorage() {
+        // 从浏览器的Local Storage中，以'playlist'为键，读取播放列表字符串
+        const playlistItemListString = localStorage.getItem('playlist') || "[]";
+        console.info(`BPlaylist::loadPlaylistFromLocalStorage(): Playlist is loaded successfully: ${playlistItemListString}`);
+        // 作为JSON字符串解析为Array并返回
+        return JSON.parse(playlistItemListString);
+    }
+
+    /**
+     * 将当前播放列表存储（更新）至浏览器的Local Storage，一般在操作播放列表后执行一次
+     */
+    storePlaylistIntoLocalStorge() {
+        // 将当前播放列表转换为JSON字符串，以'playlist'为键，存入Local Storage
+        localStorage.setItem('playlist', JSON.stringify(this.playlist));
+        console.info(`BPlaylist::storePlaylistIntoLocalStorge(): Playlist is updated successfully: ${JSON.stringify(this.playlist)}`);
     }
 
     /**
@@ -231,6 +315,7 @@ class BPlaylist {
     static checkRange(num, lower, upper, description, functionName, thisRef) {
         thisRef = thisRef || this;
         if (!(num >= lower && num <= upper)) {
+            console.log(num);
             throw new RangeError(`${thisRef.constructor.name}::${functionName}(): ${description}超出范围，应在[${lower}, ${upper}]内`);
         }
     }
@@ -247,25 +332,12 @@ class BPlaylist {
 
     /**
      * 检查传入的百分数是否在范围内，若不在范围内则抛出错误
-     * @param volume 将要检查的百分数
+     * @param percentage 将要检查的百分数
      * @param functionName 调用此函数时所在函数的名字
      * @param thisRef 调用此函数时的上下文，用于获取类名
      */
-    static checkPercentage(volume, functionName, thisRef) {
-        this.checkRange(volume, 0, 100, '百分数', functionName, thisRef);
-    }
-
-    /**
-     * 检查传入的参数是否为MusicInfo类型，若不是则抛出错误
-     * @param musicInfo 将要检查类型的变量
-     * @param functionName 调用此函数时所在函数的名字
-     * @param thisRef 调用此函数时的上下文，用于获取类名
-     */
-    static checkMusicInfo(musicInfo, functionName, thisRef) {
-        thisRef = thisRef || this;
-        if (!(musicInfo instanceof MusicInfo)) {
-            throw new TypeError(`${thisRef.constructor.name}::${functionName}(): 参数类型不正确，应为MusicInfo类的对象`);
-        }
+    static checkPercentage(percentage, functionName, thisRef) {
+        this.checkRange(percentage, 0, 100, '百分数', functionName, thisRef);
     }
 
     /**

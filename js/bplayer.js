@@ -4,27 +4,6 @@
 
 'use strict';
 
-class MusicInfo {
-    constructor(id, title, description, artists, album, url, pic, lrc) {
-        this.id = id;
-        this.title = title;
-        this.description = description;
-        this.artists = artists;
-        this.album = album;
-        this.url = url;
-        this.pic = pic;
-        this.lrc = lrc;
-    }
-}
-
-class PlaylistItem {
-    constructor(num, musicInfo) {
-        this.num = num;
-        BPlaylist.checkMusicInfo(musicInfo, 'constructor', this);
-        this.musicInfo = musicInfo;
-    }
-}
-
 /**
  * Event Handler
  * 事件处理器：
@@ -35,6 +14,14 @@ class BPlayer {
     constructor() {
         this.bPlaylist = new BPlaylist();
         this.bRender = new BRender();
+    }
+
+    initPlayer() {
+        try {
+            this.bRender.initPlayer(this.bPlaylist.initPlayer());
+        } catch (e) {
+            console.error(e);
+        }
     }
 
     onResize() {
@@ -69,6 +56,7 @@ class BPlayer {
 
     onPlayCurrentSong() {
         try {
+            this.onAddPlaylist();
             this.bRender.setPlayingStatus(this.bPlaylist.playCurrentSong());
         } catch (e) {
             console.error(e);
@@ -157,7 +145,9 @@ class BPlayer {
 
     onUpdateTime() {
         try {
-            this.bRender.setTime(this.bPlaylist.updateTime(), this.bPlaylist.getLoaded(), this.bPlaylist.getDuration());
+            if (this.bPlaylist.getDuration()) {
+                this.bRender.setTime(this.bPlaylist.updateTime(), this.bPlaylist.getLoaded(), this.bPlaylist.getDuration());
+            }
         } catch (e) {
             console.error(e);
         }
@@ -213,7 +203,9 @@ class BPlayer {
 
     onSetTime(percentage) {
         try {
-            this.bRender.setTime(this.bPlaylist.setTime(percentage), this.bPlaylist.getLoaded(), this.bPlaylist.getDuration());
+            if (this.bPlaylist.getDuration()) {
+                this.bRender.setTime(this.bPlaylist.setTime(percentage), this.bPlaylist.getLoaded(), this.bPlaylist.getDuration());
+            }
         } catch (e) {
             console.error(e);
         }
@@ -227,7 +219,31 @@ class BPlayer {
         }
     }
 
-    addToFavorite() {
+    onPlay() {
+        try {
+            this.bRender.playNow(this.bPlaylist.playNow());
+            this.onSetTime(0);
+            this.onPlayCurrentSong();
+            this.onShowPlaylist();
+        } catch (e) {
+            console.error(e);
+        }
+    }
+
+    onPlaylist() {
+        this.onAddPlaylist();
+        this.onShowPlaylist();
+    }
+
+    onAddPlaylist(item) {
+        try {
+            this.bRender.addToPlaylist(this.bPlaylist.addToPlaylist(item));
+        } catch (e) {
+            console.error(e);
+        }
+    }
+
+    onFavorite() {
         try {
             this.bRender.addToFavorite(this.bPlaylist.addToFavorite());
         } catch (e) {
@@ -235,9 +251,49 @@ class BPlayer {
         }
     }
 
-    downloadCurrentSong(url) {
+    onDownload() {
         try {
-            this.bRender.downloadCurrentSong(this.bPlaylist.downloadCurrentSong(url));
+            this.bRender.downloadCurrentSong(this.bPlaylist.downloadCurrentSong());
+        } catch (e) {
+            console.error(e);
+        }
+    }
+
+    onClipboardSuccess(e) {
+        try {
+            this.bRender.clipboardSuccess(this.bPlaylist.clipboardSuccess(e));
+        } catch (e) {
+            console.error(e);
+        }
+    }
+
+    onClipboardError(e) {
+        try {
+            this.bRender.clipboardError(this.bPlaylist.clipboardError(e));
+        } catch (e) {
+            console.error(e);
+        }
+    }
+
+    onMakeUpSongPage(musicInfo) {
+        try {
+            this.bRender.makeUpSongPage(this.bPlaylist.setSongInfo(musicInfo));
+        } catch (e) {
+            console.error(e);
+        }
+    }
+
+    onUpdateTag(data, $span) {
+        try {
+            this.bRender.updateTag(data, $span, this.bPlaylist.updateTag());
+        } catch (e) {
+            console.error(e);
+        }
+    }
+
+    onSetBoard(mode) {
+        try {
+            this.bRender.setBoard(this.bPlaylist.setBoard(mode));
         } catch (e) {
             console.error(e);
         }

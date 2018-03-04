@@ -48,19 +48,20 @@
         </div>
     </div>
 </nav>
-<body class="noto-sc" id="body">
-<div id="page-container" class="container">
+<body id="body" class="noto-sc">
+<div id="page-container" class="container" data-type="song" data-id="7">
     <div id="bg-image-container col-12">
         <div class="container">
             <div class="col-12">
-                <img id="bg-image" src="http://api.anisong.niconi.cc/image/girlslasttourED.jpg">
+                <img id="bg-image" src="">
             </div>
         </div>
     </div>
     <div class="col-6 px-0">
         <div class="container no-gutters">
             <div id="disc-group" class="col-12">
-                <img id="disc-cover" src="http://api.anisong.niconi.cc/image/girlslasttourED.jpg" class="disc-cover-animated animation-paused"/>
+                <img id="disc-cover" src="image/disc_default.png"
+                     class="disc-cover-animated animation-paused"/>
                 <img id="disc-mask" src="image/disc_mask.png" class="disc-mask-animated animation-paused"/>
                 <img id="disc-light" src="image/disc_light.png"/>
                 <img id="disc-play" src="image/disc_play.png"/>
@@ -70,24 +71,24 @@
     </div>
     <div class="col-6 ml-auto mt-5 pl-5 minh">
         <div id="quality" class="px-1 unselectable">
-            <p>高质量</p>
+            <p id="state">读取中</p>
         </div>
         <div id="count" class="unselectable" data-toggle="tooltip" data-html="true" data-placement="left"
-             title="播放数<br><hr>下载数">
+             title="周播放<br><hr>月播放">
             <div id="count-switch" class="count-on"></div>
-            <p id="count-play">9</p>
-            <p id="count-download">9999</p>
+            <p id="count-week">读取中</p>
+            <p id="count-month">读取中</p>
         </div>
         <div id="title" class="col-auto my-1 my-lg-2 my-xl-3 mr-4" data-toggle="tooltip" data-placement="top"
              data-offset="-55%"
              data-template='<div class="tooltip" role="tooltip"><div class="arrow"></div><div class="tooltip-inner title-tooltip"></div></div>'
-             title="Uploader: 絢瀬絵里">
-            雨だれの歌
+             title="Uploader: 读取中">
+            读取中...
         </div>
         <div id="description" class="mr-4">
-            <span id="description-text">
-                新潮社のWEBコミックサイト『くらげバンチ』にて連載の人気コミック『少女終末旅行』がTVアニメ化。終末の世界を旅する少女2人、水瀬いのり演じるチトと、久保ユリカ演じるユーリの人気声優による、オープニング・テーマがリリース!
-            </span>
+            <div id="description-text">
+                读取中...<span class="icomoon-spinner2 loading-animated"></span>
+            </div>
             <span>　</span>
             <span id="collapse-toggle" class="link collect unselectable">展开</span>
 
@@ -124,15 +125,15 @@
                             歌手
                         </th>
                         <td id="artist">
-                            <a href="#" class="link">チト</a>/<a href="#" class="link">ユーリ</a>
+                            读取中...<span class="icomoon-spinner2 loading-animated"></span>
                         </td>
                     </tr>
                     <tr>
                         <th>
-                            所属专辑
+                            专辑
                         </th>
                         <td>
-                            <a id="album" href="#" class="link">TVアニメ「少女終末旅行」エンディングテーマ「More One Night」</a>
+                            <a id="album" href="#" class="link">读取中...<span class="icomoon-spinner2 loading-animated"></span></a>
                             <a href="http://www.nexushd.org" target="_blank" class="float-right">
                                 <span class="oi oi-external-link external"></span>
                             </a>
@@ -140,30 +141,18 @@
                     </tr>
                     <tr>
                         <th>
-                            所在歌单
+                            系列
                         </th>
                         <td>
-                            <a href="#" class="link">Sample Playlist</a>
+                            <a id="work" href="#" class="link">读取中...<span class="icomoon-spinner2 loading-animated"></span></a>
                         </td>
                     </tr>
                     <tr>
-                        <td colspan="2">
-                            <div class="float-left">
-                            <span class="oi oi-tag icon-tag" data-toggle="tooltip" data-html="true"
-                                  title="<em>No preview</em>"></span>
-                                <a href="#" class="link tag mr-3">OP</a>
-                            </div>
-                            <div class="float-left">
-                            <span class="oi oi-tag icon-tag" data-toggle="tooltip" data-html="true"
-                                  title="<em>No preview</em>"></span>
-                                <a href="#" class="link tag mr-3">17年10月番</a>
-                            </div>
-                            <div class="float-left">
-                            <span class="oi oi-tag icon-tag" data-toggle="tooltip" data-html="true"
-                                  title="<img src='http://api.anisong.niconi.cc/image/girlslasttour.jpg' width=100 style='padding:0;'/>">
-                            </span>
-                                <a href="#" class="link tag mr-3">少女终末旅行</a>
-                            </div>
+                        <th>
+                            标签
+                        </th>
+                        <td id="tag">
+                            <a id="tag-loading">读取中...<span class="icomoon-spinner2 loading-animated"></span></a>
                         </td>
                     </tr>
                 </table>
@@ -190,9 +179,8 @@
             <span id="control-board" class="icomoon-linkedin"></span>
         </div>
     </div>
-    <audio controls="controls" id="bplayer" src="http://api.anisong.niconi.cc/file/7.m4a"></audio>
+    <audio controls="controls" id="bplayer" src="" style="display: none;"></audio>
 </div>
-<!--<div id="player" class="aplayer mx-auto" style="display: none"></div>-->
 <div id="player-container" class="container-fluid no-gutters px-0">
     <!--Fixed at bottom-->
     <div class="col-12 col-lg-11 col-xl-10 mx-auto">
@@ -241,14 +229,14 @@
                         </div>
                     </div>
                     <div id="playlist-box">
-                        <ol id="playlist-list">
+                        <ol id="playlist">
                             <li id="playlist-not-exist">播放列表是空的</li>
                         </ol>
                     </div>
                 </div>
             </div>
             <div class="col-4 col-md-4 col-lg-3 col-xl-3 px-0">
-                <div class="container-fluid px-0 d-flex" style="height:3.5rem;">
+                <div class="container-fluid px-0 d-flex">
                     <div class="col-2 px-0 ml-4 ml-md-4 ml-lg-3 ml-xl-3 mr-0 mr-lg-1 mr-xl-2">
                         <p class="text-center">
                             <span id="control-volume" class="icomoon-volume-high"></span>
@@ -274,7 +262,7 @@
                     </div>
                     <div class="col-2 px-0">
                         <p class="text-center">
-                            <span id="control-list" class="icomoon-menu4"></span>
+                            <span id="control-list" class="icomoon-menu4" data-hidden="true"></span>
                         </p>
                     </div>
                 </div>
@@ -286,7 +274,6 @@
 <script type="text/javascript" src="include/popper.js"></script>
 <script type="text/javascript" src="include/jquery.popup.js"></script>
 <script type="text/javascript" src="include/bootstrap.js"></script>
-<!--<script type="text/javascript" src="include/APlayer.min.js"></script>-->
 <script type="text/javascript" src="include/clipboard.js"></script>
 <script type="text/javascript" src="include/lyrics.js"></script>
 <script type="text/javascript" src="js/bplaylist.js"></script>

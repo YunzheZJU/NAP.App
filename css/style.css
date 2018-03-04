@@ -303,7 +303,7 @@ a:hover {
     animation: disc-cover-rotate-keyframe 60s linear infinite;
 }
 
-@-webkit-keyframes disc-mask-rotate-keyframe {
+@-webkit-keyframes normal-rotate-keyframe {
     from {
         transform: rotate(0deg);
     }
@@ -312,7 +312,7 @@ a:hover {
     }
 }
 
-@keyframes disc-mask-rotate-keyframe {
+@keyframes normal-rotate-keyframe {
     from {
         transform: rotate(0deg);
     }
@@ -322,8 +322,8 @@ a:hover {
 }
 
 .disc-mask-animated {
-    -webkit-animation: disc-mask-rotate-keyframe 60s linear infinite;
-    animation: disc-mask-rotate-keyframe 60s linear infinite;
+    -webkit-animation: normal-rotate-keyframe 60s linear infinite;
+    animation: normal-rotate-keyframe 60s linear infinite;
 }
 
 .animation-paused {
@@ -335,6 +335,13 @@ a:hover {
     -moz-user-select: none;
     -ms-user-select: none;
     user-select: none;
+}
+
+.loading-animated {
+    font-size: 1.2rem;
+    position: absolute;
+    -webkit-animation: normal-rotate-keyframe 1s linear infinite;
+    animation: normal-rotate-keyframe 1s linear infinite;
 }
 
 #quality {
@@ -391,11 +398,11 @@ a:hover {
     border-radius: 0 0 0.3rem 0.3rem;
 }
 
-#count-play {
+#count-week {
     line-height: 1.5rem;
 }
 
-#count-download {
+#count-month {
     line-height: 1.2rem;
 }
 
@@ -419,6 +426,7 @@ hr {
 
 #description {
     margin-left: 3.5rem;
+    min-height: 3rem;
     color: gray;
     cursor: default;
 }
@@ -429,6 +437,7 @@ hr {
 
 #info-board {
     position: absolute;
+    width: 90%;
     transform-origin: 50% 50% 12rem;
     -webkit-transform: rotateY(0deg);
     transform: rotateY(0deg);
@@ -459,7 +468,7 @@ hr {
     -moz-user-select: none;
     -ms-user-select: none;
     user-select: none;
-    width: 5rem;
+    width: 4rem;
     font-weight: normal;
     vertical-align: top;
 }
@@ -527,7 +536,6 @@ hr {
 #lyric-board {
     -webkit-transform: rotateY(90deg);
     transform: rotateY(90deg);
-
 }
 
 #lyric-board-chs {
@@ -673,7 +681,7 @@ hr {
 
 #player-container {
     position: fixed;
-    bottom: 0;
+    bottom: -3.5rem;
     height: 3.5rem;
     max-height: 15rem;
     z-index: 6;
@@ -683,8 +691,8 @@ hr {
     background: #8785A2 linear-gradient(-45deg, rgba(255, 255, 255, .15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, .15) 50%, rgba(255, 255, 255, .15) 75%, transparent 75%, transparent);
     background-size: 5rem 5rem;
     opacity: 0.95;
-    -webkit-transition: all .5s ease;
-    transition: all .5s ease;
+    -webkit-transition: all .4s ease;
+    transition: all .4s ease;
 }
 
 #player-bg {
@@ -953,30 +961,30 @@ hr {
     -webkit-padding-start: 0;
 }
 
-#playlist-list {
+#playlist {
     overflow: auto;
     max-height: 13.5rem;
 }
 
-#playlist-list::-webkit-scrollbar-track {
+#playlist::-webkit-scrollbar-track {
     background-color: #f6f6f6;
 }
 
-#playlist-list::-webkit-scrollbar {
+#playlist::-webkit-scrollbar {
     width: 5px;
 }
 
-#playlist-list::-webkit-scrollbar-thumb {
+#playlist::-webkit-scrollbar-thumb {
     background-color: #d0cedf;
 }
 
-#playlist-list div {
+#playlist div {
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
 }
 
-#playlist-list .active {
+#playlist .active {
     background-color: #d0cedf;
 }
 
@@ -1015,6 +1023,7 @@ hr {
 .playlist-item {
     line-height: 1.75rem;
     color: #555555;
+    border-radius: 5px;
     -webkit-animation: playlist-item-appear .5s ease-out 1;
     animation: playlist-item-appear .5s ease-out 1;
 }
@@ -1027,15 +1036,8 @@ hr {
     background-color: rgba(255, 255, 255, 0.9);
 }
 
-.playlist-item:first-child {
-    border-top-left-radius: 5px;
-    border-top-right-radius: 5px;
-}
-
 .playlist-item:last-child {
     margin-bottom: 0 !important;
-    border-bottom-left-radius: 5px;
-    border-bottom-right-radius: 5px;
 }
 
 .playlist-item:hover {
