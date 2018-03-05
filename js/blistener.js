@@ -175,7 +175,7 @@ class BListener {
         }
     }
 
-    onClickCollapseToggle(e) {
+    onClickCollapseToggle() {
         if (this.isDescriptionCollected) {
             bPlayer.onSpreadDescription();
         } else {
@@ -193,7 +193,7 @@ class BListener {
         }
     }
 
-    onClickControlMode(e) {
+    onClickControlMode() {
         this.controlMode = ++this.controlMode === 5 ? 1 : this.controlMode;
         bPlayer.onSetCirculation(this.controlMode);
     }
@@ -259,11 +259,11 @@ class BListener {
         bPlayer.onSetVolume(percentage);
     }
 
-    onClickBtnPlay(e) {
+    onClickBtnPlay() {
         bPlayer.onPlay();
     }
 
-    onClickBtnAdd(e) {
+    onClickBtnAdd() {
         bPlayer.onPlaylist();
     }
 
@@ -302,7 +302,7 @@ class BListener {
         bPlayer.onUpdateTag(data, $span);
     }
 
-    onClickControlBoard(e) {
+    onClickControlBoard() {
         this.controlBoard = ++this.controlBoard === 4 ? 1 : this.controlBoard;
         bPlayer.onSetBoard(this.controlBoard);
     }

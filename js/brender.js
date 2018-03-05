@@ -273,7 +273,7 @@ class BRender {
         $('#playlist-box').css('opacity', '1');
         // 计算所需高度
         const value = `${1.25 + (playlistCount || 1) * 2.25}rem`;
-        console.log(value);
+        console.log(`player height: ${value}`);
         // 改变样式
         $('#player-container').css('height', value);
     }
@@ -469,6 +469,13 @@ class BRender {
             );
             $('#playlist').append($li);
         } else {
+            const scrollTop = $(`#playlist`).scrollTop() / 16;
+            const itemScrolled = ~~(scrollTop / 2.25 + 0.4);
+            const listHeight = $('#player-container').css('height') / 2.25;
+            console.log(`scollTop(): ${scrollTop}rem`);
+            console.log(`${itemScrolled} items are scrolled`);
+            console.log(`list height is ${listHeight} items`);
+            // Range: [itemScrolled + 1, itemScrolled + 1 + listHeight]
             $(`#playlist`).find(`li:nth-child(${item + 1})`).fadeOut(200).fadeIn(200);
         }
     }
