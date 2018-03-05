@@ -2,6 +2,10 @@
  * Created by Yunzhe on 2018/2/4.
  */
 
+html {
+    font-size: 16px;
+}
+
 body {
     background-color: #FFE2E2;
     -webkit-font-smoothing: antialiased;
@@ -327,8 +331,8 @@ a:hover {
 }
 
 .animation-paused {
-     animation-play-state: paused;
- }
+    animation-play-state: paused;
+}
 
 .unselectable {
     -webkit-user-select: none;
@@ -964,6 +968,8 @@ hr {
 #playlist {
     overflow: auto;
     max-height: 13.5rem;
+    -webkit-transition: all 2s ease;
+    transition: all 2s ease;
 }
 
 #playlist::-webkit-scrollbar-track {
@@ -1023,7 +1029,8 @@ hr {
 .playlist-item {
     line-height: 1.75rem;
     color: #555555;
-    border-radius: 5px;
+    border-top-left-radius: 5px;
+    border-bottom-left-radius: 5px;
     -webkit-animation: playlist-item-appear .5s ease-out 1;
     animation: playlist-item-appear .5s ease-out 1;
 }

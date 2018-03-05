@@ -71,9 +71,7 @@ class BRender {
     }
 
     initPlayer(playlistItemList) {
-        playlistItemList.forEach((item) => {
-            $('#playlist').trigger('add', item);
-        });
+        $('#playlist').trigger('addData', {list: playlistItemList});
     }
 
     /**
@@ -174,6 +172,7 @@ class BRender {
      * @param playing 将要设定的播放状态，应为布尔值，true表示播放
      */
     setPlayingStatus(playing) {
+        console.log(this.needle_rotation_max);
         // 检查参数类型
         BPlaylist.checkBoolean(playing, 'setPlayingStatus', this);
         // 设置唱片样式
@@ -273,7 +272,6 @@ class BRender {
         $('#playlist-box').css('opacity', '1');
         // 计算所需高度
         const value = `${1.25 + (playlistCount || 1) * 2.25}rem`;
-        console.log(`player height: ${value}`);
         // 改变样式
         $('#player-container').css('height', value);
     }
@@ -467,16 +465,31 @@ class BRender {
                 </div>
                 </li>`
             );
+            $(`#playlist`).trigger('addChild', $li);
             $('#playlist').append($li);
+            this.scrollToFocus(item.num);
         } else {
-            const scrollTop = $(`#playlist`).scrollTop() / 16;
-            const itemScrolled = ~~(scrollTop / 2.25 + 0.4);
-            const listHeight = $('#player-container').css('height') / 2.25;
-            console.log(`scollTop(): ${scrollTop}rem`);
-            console.log(`${itemScrolled} items are scrolled`);
-            console.log(`list height is ${listHeight} items`);
-            // Range: [itemScrolled + 1, itemScrolled + 1 + listHeight]
-            $(`#playlist`).find(`li:nth-child(${item + 1})`).fadeOut(200).fadeIn(200);
+            this.highlightItem(item);
+        }
+    }
+
+    scrollToFocus(item) {
+        const rem = ~~($('html').css('font-size').split('px')[0]);
+        const scrollTop = $(`#playlist`).scrollTop() / rem;
+        const itemScrolled = ~~(scrollTop / 2.25 + 0.4);
+        const listHeight = $('#playlist').height() / 2.25 / rem;
+        console.log(`scrollTop(): ${scrollTop}rem`);
+        console.log(`${itemScrolled} items are scrolled`);
+        console.log(`list height is ${listHeight} items`);
+        // Range: [itemScrolled + 1, itemScrolled + listHeight]
+        if (item < itemScrolled + 1) {
+            const deltaItemCount = (itemScrolled + 1) - item;
+            $(`#playlist`).animate({scrollTop: scrollTop - 2.25 * rem * deltaItemCount}, 500);
+            console.log(`scroll to: ${scrollTop - 2.25 * rem * deltaItemCount}px`);
+        } else if (item > itemScrolled + listHeight) {
+            const deltaItemCount = item - (itemScrolled + 1);
+            $(`#playlist`).animate({scrollTop: scrollTop + 2.25 * rem * deltaItemCount}, 500);
+            console.log(`scroll to: ${scrollTop + 2.25 * rem * deltaItemCount}px`);
         }
     }
 
@@ -485,7 +498,7 @@ class BRender {
         const imageUrl = data['imageUrl'];
         $span.attr('data-original-title',
             `${imageUrl ? `<img src='http://api.anisong.online${imageUrl}' width=100 style='padding:0;'/></br>` : ``}\
-            <em>${description ? description : `No description`}</em>`);
+            ${description ? description : `<em>No description</em>`}`);
     }
 
     setBoard(mode) {
@@ -514,6 +527,16 @@ class BRender {
                 $control_board.removeClass().addClass('icomoon-trello');
                 break;
         }
+    }
+
+    highlightItem(num) {
+        this.scrollToFocus(num);
+        $(`#playlist`).find(`li:nth-child(${num + 1})`).fadeOut(700).fadeIn(300);
+    }
+
+    chooseSong(num) {
+        $(`#playlist`).find('li').removeClass('active');
+        $(`#playlist`).find(`li:nth-child(${num + 1})`).addClass('active');
     }
 
     /**

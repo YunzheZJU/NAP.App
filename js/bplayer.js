@@ -36,28 +36,24 @@ class BPlayer {
      * 从播放列表中选择上一曲播放，若已为第一首，选择最后一首播放
      */
     onPlayPreviousSong() {
-        try {
-            this.bRender.playPreviousSong(this.bPlaylist.playPreviousSong());
-        } catch (e) {
-            console.error(e);
-        }
+        this.onSetSong(this.bPlaylist.choosePreviousSong())
     }
 
     /**
      * 从播放列表中选择下一曲播放，若已为最后一首，选择第一首播放
      */
     onPlayNextSong() {
-        try {
-            this.bRender.playNextSong(this.bPlaylist.playNextSong());
-        } catch (e) {
-            console.error(e);
-        }
+        this.onSetSong(this.bPlaylist.chooseNextSong())
     }
 
     onPlayCurrentSong() {
+        this.onAddPlaylist();
+        this.onPlayContinue();
+    }
+
+    onPlayContinue() {
         try {
-            this.onAddPlaylist();
-            this.bRender.setPlayingStatus(this.bPlaylist.playCurrentSong());
+            this.bRender.setPlayingStatus(this.bPlaylist.playContinue());
         } catch (e) {
             console.error(e);
         }
@@ -235,6 +231,12 @@ class BPlayer {
         this.onShowPlaylist();
     }
 
+    onAddPlaylistItems(items) {
+        items.forEach((item) => {
+            this.onAddPlaylist(item);
+        })
+    }
+
     onAddPlaylist(item) {
         try {
             this.bRender.addToPlaylist(this.bPlaylist.addToPlaylist(item));
@@ -294,6 +296,29 @@ class BPlayer {
     onSetBoard(mode) {
         try {
             this.bRender.setBoard(this.bPlaylist.setBoard(mode));
+        } catch (e) {
+            console.error(e);
+        }
+    }
+
+    onSetSong(num) {
+        this.onChooseSong(num);
+        this.onSetTime(0);
+        this.onHighlightItem(num);
+        this.onPlayContinue();
+    }
+
+    onHighlightItem(num) {
+        try {
+            this.bRender.highlightItem(this.bPlaylist.highlightItem(num));
+        } catch (e) {
+            console.error(e);
+        }
+    }
+
+    onChooseSong(num) {
+        try {
+            this.bRender.chooseSong(this.bPlaylist.chooseSong(num));
         } catch (e) {
             console.error(e);
         }

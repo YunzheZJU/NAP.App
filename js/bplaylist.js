@@ -18,6 +18,7 @@ class BPlaylist {
         this.circulationMode = 3;
         this.circulationModeDict = {1: 'random', 2: 'single', 3: 'circulation', 4: 'order'};
         this.currentSong = 1;
+        this.currentPageSongInfo = null;
         this.timeBeforeSeeking = 0;
         this.volumeBeforeSeeking = 0;
     }
@@ -34,32 +35,21 @@ class BPlaylist {
         return !this.audio.paused;
     }
 
-    /**
-     * 选择播放列表中的上一首歌并播放，若当前歌曲为第一首则选择播放列表中的最后一首播放
-     */
-    playPreviousSong() {
-        this.pauseCurrentSong();
-        const currentSong = (this.currentSong - 1) || this.playlist.length;
-        this.setSong(currentSong);
-        // TODO: 想办法在完成加载之后播放这首歌
+    choosePreviousSong() {
+        this.currentSong = this.currentSong === 1 ? this.playlist.length : (this.currentSong - 1);
+        return this.currentSong;
     }
 
-    /**
-     * 选择播放列表中的下一首歌并播放，若当前歌曲为最后一首则选择播放列表中的第一首播放
-     */
-    playNextSong() {
-        this.pauseCurrentSong();
-        let currentSong = this.currentSong + 1;
-        currentSong = (currentSong > this.playlist.length) ? 0 : currentSong;
-        this.setSong(currentSong);
-        // TODO: 想办法在完成加载之后播放这首歌
+    chooseNextSong() {
+        this.currentSong = this.currentSong === this.playlist.length ? 1 : (this.currentSong + 1);
+        return this.currentSong;
     }
 
     /**
      * 播放当前歌曲
      * @return {boolean} 返回固定值true
      */
-    playCurrentSong() {
+    playContinue() {
         this.audio.play();
         return true
     }
@@ -71,26 +61,6 @@ class BPlaylist {
     pauseCurrentSong() {
         this.audio.pause();
         return false;
-    }
-
-
-    /**
-     * 根据传入的播放列表编号，将指定的歌曲加载入播放器，并不意味着会自动播放
-     * @param num 将要播放的歌曲在播放列表中的编号
-     * @return {*} 歌曲信息
-     */
-    setSong(num) {
-        // 检查参数类型
-        this.checkListNumber(num, 'setSong');
-        // 获取歌曲信息
-        const musicInfo = this.playlist[num - 1].musicInfo;
-        // 设置歌曲源
-        this.audio.src = musicInfo.url;
-        // 记录当前播放的歌曲在播放列表中的编号
-        this.currentSong = num;
-        // TODO: 想办法在完成加载之后播放这首歌
-        // TODO: 是否需要清理？
-        return musicInfo
     }
 
     showCount() {
@@ -201,7 +171,7 @@ class BPlaylist {
     }
 
     playNow() {
-        this.audio.src = `http://api.anisong.online${this.currentSongInfo['fileUrl']}`;
+        this.audio.src = `http://api.anisong.online${this.currentPageSongInfo['fileUrl']}`;
     }
 
     addToPlaylist(item) {
@@ -211,10 +181,11 @@ class BPlaylist {
         } else {
             const newItem = item ? item : {
                 num: this.playlist.length + 1,
-                id: ~~this.currentSongInfo['id'],
-                title: this.currentSongInfo['title'],
-                artist: BRender.makeUpArtists(this.currentSongInfo['simpleArtistInfos']),
-                duration: ~~this.currentSongInfo['duration'] / 1000
+                id: ~~this.currentPageSongInfo['id'],
+                src: `http://api.anisong.online${this.currentPageSongInfo['fileUrl']}`,
+                title: this.currentPageSongInfo['title'],
+                artist: BRender.makeUpArtists(this.currentPageSongInfo['simpleArtistInfos']),
+                duration: ~~this.currentPageSongInfo['duration'] / 1000
             };
             this.playlist.push(newItem);
             if (!item) {
@@ -225,7 +196,7 @@ class BPlaylist {
     }
 
     findCurrentSongInPlaylist(item) {
-        let songInfo = item ? item : this.currentSongInfo;
+        let songInfo = item ? item : this.currentPageSongInfo;
         let i;
         for (i = 1; i <= this.playlist.length; i++) {
             if (this.playlist[i - 1].id === ~~songInfo['id']) {
@@ -253,9 +224,9 @@ class BPlaylist {
 
 
     setSongInfo(musicInfo) {
-        this.currentSongInfo = musicInfo;
+        this.currentPageSongInfo = musicInfo;
         if (!this.audio.currentSrc) {
-            this.audio.src = `http://api.anisong.online${this.currentSongInfo['fileUrl']}`;
+            this.audio.src = `http://api.anisong.online${this.currentPageSongInfo['fileUrl']}`;
         }
         return musicInfo;
     }
@@ -266,6 +237,16 @@ class BPlaylist {
 
     setBoard(mode) {
         return mode;
+    }
+
+    highlightItem(num) {
+        return num;
+    }
+
+    chooseSong(num) {
+        this.audio.src = this.playlist[num - 1].src;
+        this.currentSong = num;
+        return num;
     }
 
     /**

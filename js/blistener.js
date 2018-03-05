@@ -16,9 +16,7 @@ class BListener {
     constructor() {
         this.isSeekingTime = false;
         this.isSeekingVolume = false;
-        this.isPlaylistHidden = true;
         this.isDescriptionCollected = true;
-        this.isLoading = true;
         this.progressContainerWidth = 0;
         this.volumeContainerWidth = 0;
         this.controlMode = 3;
@@ -134,8 +132,17 @@ class BListener {
         $(document).mousemove((e) => {this.onMouseMoveDocument(e)});
         // OK添加整个页面上鼠标弹起的侦听器
         $(document).mouseup((e) => {this.onMouseUpDocument(e)});
-        // 添加播放列表的侦听器
-        $('#playlist').on('add', (e, item) => {this.onAddPlaylist(e, item)});
+        // 添加播放列表“添加数据”的侦听器
+        $('#playlist').on('addData', (e, data) => {this.onAddDataPlaylist(e, data)});
+        // 添加播放列表“添加子项”的侦听器
+        $('#playlist').on('addChild', (e, data) => {this.onAddChildPlaylistItems(e, data)});
+    }
+
+    changePage(id) {
+        $.get('pjax.html', (data) => {
+            $('#page-container').empty().attr('data-id', id).append(data);
+            this.initPage();
+        });
     }
 
     onResize() {
@@ -307,7 +314,15 @@ class BListener {
         bPlayer.onSetBoard(this.controlBoard);
     }
 
-    onAddPlaylist(e, item) {
-        bPlayer.onAddPlaylist(item);
+    onAddDataPlaylist(e, data) {
+        bPlayer.onAddPlaylistItems(data.list);
+    }
+
+    onAddChildPlaylistItems(e, data) {
+        $(data).dblclick((e) => {this.onDblClickPlaylistItem(e)});
+    }
+
+    onDblClickPlaylistItem(e) {
+        bPlayer.onSetSong(~~($(e.currentTarget).attr('data-num')));
     }
 }
