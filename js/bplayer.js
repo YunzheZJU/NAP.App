@@ -216,14 +216,20 @@ class BPlayer {
     }
 
     onPlay() {
+        this.onAddPlaylist(undefined, true);
+        this.onShowPlaylist();
+        this.onSetPageSong();
+        this.onSetTime(0);
+        this.onPlayContinue();
+    }
+
+    onSetPageSong() {
         try {
             this.bRender.playNow(this.bPlaylist.playNow());
-            this.onSetTime(0);
-            this.onPlayCurrentSong();
-            this.onShowPlaylist();
         } catch (e) {
             console.error(e);
         }
+
     }
 
     onPlaylist() {
@@ -234,12 +240,13 @@ class BPlayer {
     onAddPlaylistItems(items) {
         items.forEach((item) => {
             this.onAddPlaylist(item);
-        })
+        });
+        this.bPlaylist.initAudioSrc();
     }
 
-    onAddPlaylist(item) {
+    onAddPlaylist(item, active) {
         try {
-            this.bRender.addToPlaylist(this.bPlaylist.addToPlaylist(item));
+            this.bRender.addToPlaylist(this.bPlaylist.addToPlaylist(item), active);
         } catch (e) {
             console.error(e);
         }
@@ -321,6 +328,17 @@ class BPlayer {
             this.bRender.chooseSong(this.bPlaylist.chooseSong(num));
         } catch (e) {
             console.error(e);
+        }
+    }
+
+    onSwitchSong() {
+        const nextSong = this.bPlaylist.switchSong();
+        this.onPauseCurrentSong();
+        this.onChooseSong(nextSong);
+        this.onSetTime(0);
+        this.onHighlightItem(nextSong);
+        if (nextSong) {
+            this.onPlayContinue();
         }
     }
 }

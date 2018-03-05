@@ -172,7 +172,6 @@ class BRender {
      * @param playing 将要设定的播放状态，应为布尔值，true表示播放
      */
     setPlayingStatus(playing) {
-        console.log(this.needle_rotation_max);
         // 检查参数类型
         BPlaylist.checkBoolean(playing, 'setPlayingStatus', this);
         // 设置唱片样式
@@ -453,13 +452,13 @@ class BRender {
 
     }
 
-    addToPlaylist(item) {
+    addToPlaylist(item, active) {
         if (item.num) {
             $('#playlist-not-exist').hide();
             const $li = $(
-                `<li class="container-fluid playlist-item py-1" data-num="${item.num}" data-id="${item.id}">
+                `<li class="container-fluid playlist-item py-1 ${item.num === 1 ? 'active' : ''}" data-num="${item.num}" data-id="${item.id}">
                 <div class="row unselectable">
-                <div class="col-4 col-md-5 col-lg-7 playlist-title"><a href="#">${item.title}</a></div>
+                <div class="col-4 col-md-5 col-lg-7 playlist-title"><a href="javascript:bListener.changePage(${item.id})">${item.title}</a></div>
                 <div class="col-4 col-md-4 col-lg-3 playlist-artist">${item.artist}</div>
                 <div class="col-4 col-md-3 col-lg-2 playlist-duration">${BRender.convertTimeFromNumber(item.duration)}</div>
                 </div>
@@ -467,29 +466,27 @@ class BRender {
             );
             $(`#playlist`).trigger('addChild', $li);
             $('#playlist').append($li);
-            this.scrollToFocus(item.num);
+            this.scrollToFocus(item.num, active);
         } else {
-            this.highlightItem(item);
+            this.highlightItem(item, active);
         }
     }
 
-    scrollToFocus(item) {
+    scrollToFocus(item, active) {
         const rem = ~~($('html').css('font-size').split('px')[0]);
         const scrollTop = $(`#playlist`).scrollTop() / rem;
         const itemScrolled = ~~(scrollTop / 2.25 + 0.4);
         const listHeight = $('#playlist').height() / 2.25 / rem;
-        console.log(`scrollTop(): ${scrollTop}rem`);
-        console.log(`${itemScrolled} items are scrolled`);
-        console.log(`list height is ${listHeight} items`);
         // Range: [itemScrolled + 1, itemScrolled + listHeight]
         if (item < itemScrolled + 1) {
             const deltaItemCount = (itemScrolled + 1) - item;
             $(`#playlist`).animate({scrollTop: scrollTop - 2.25 * rem * deltaItemCount}, 500);
-            console.log(`scroll to: ${scrollTop - 2.25 * rem * deltaItemCount}px`);
         } else if (item > itemScrolled + listHeight) {
             const deltaItemCount = item - (itemScrolled + 1);
             $(`#playlist`).animate({scrollTop: scrollTop + 2.25 * rem * deltaItemCount}, 500);
-            console.log(`scroll to: ${scrollTop + 2.25 * rem * deltaItemCount}px`);
+        }
+        if (active) {
+            this.chooseSong(item);
         }
     }
 
@@ -529,8 +526,8 @@ class BRender {
         }
     }
 
-    highlightItem(num) {
-        this.scrollToFocus(num);
+    highlightItem(num, active) {
+        this.scrollToFocus(num, active);
         $(`#playlist`).find(`li:nth-child(${num + 1})`).fadeOut(700).fadeIn(300);
     }
 

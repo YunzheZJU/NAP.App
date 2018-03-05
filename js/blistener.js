@@ -119,7 +119,7 @@ class BListener {
         // 添加音频的“error”侦听器
         $('#bplayer').on('error', (e) => {console.log('error');console.log($('#bplayer')[0].error);});
         // 添加音频的“ended”侦听器
-        $('#bplayer').on('ended', (e) => {console.log('ended');console.log(e);});
+        $('#bplayer').on('ended', (e) => {this.onEndedBplayer(e)});
         // OK添加播放进度槽的侦听器
         $('#progress-go').click((e) => {this.onClickProgressGo(e)});
         // OK添加音量槽的侦听器
@@ -161,7 +161,7 @@ class BListener {
 
     onClickControlToggle() {
         if ($('.icomoon-play2').length) {
-            bPlayer.onPlayCurrentSong();
+            bPlayer.onPlayContinue();
         } else {
             bPlayer.onPauseCurrentSong();
         }
@@ -292,7 +292,6 @@ class BListener {
     }
 
     onAjaxSongSuccess(data) {
-        console.log(data);
         this.initSongPageListenersBeforeMakeUp();
         // 用歌曲信息初始化播放器组装页面元素
         // 若播放器中歌曲源为空，将歌曲url填入播放器
@@ -324,5 +323,9 @@ class BListener {
 
     onDblClickPlaylistItem(e) {
         bPlayer.onSetSong(~~($(e.currentTarget).attr('data-num')));
+    }
+
+    onEndedBplayer() {
+        bPlayer.onSwitchSong();
     }
 }

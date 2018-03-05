@@ -50,8 +50,12 @@ class BPlaylist {
      * @return {boolean} 返回固定值true
      */
     playContinue() {
-        this.audio.play();
-        return true
+        if (this.audio.src) {
+            this.audio.play();
+            return true
+        } else {
+            return false;
+        }
     }
 
     /**
@@ -174,6 +178,12 @@ class BPlaylist {
         this.audio.src = `http://api.anisong.online${this.currentPageSongInfo['fileUrl']}`;
     }
 
+    initAudioSrc() {
+        if (this.playlist.length) {
+            this.audio.src = this.playlist[0].src;
+        }
+    }
+
     addToPlaylist(item) {
         const result = this.findCurrentSongInPlaylist(item);
         if (result) {
@@ -225,9 +235,9 @@ class BPlaylist {
 
     setSongInfo(musicInfo) {
         this.currentPageSongInfo = musicInfo;
-        if (!this.audio.currentSrc) {
-            this.audio.src = `http://api.anisong.online${this.currentPageSongInfo['fileUrl']}`;
-        }
+        // if (!this.audio.currentSrc) {
+        //     this.audio.src = `http://api.anisong.online${this.currentPageSongInfo['fileUrl']}`;
+        // }
         return musicInfo;
     }
 
@@ -244,9 +254,39 @@ class BPlaylist {
     }
 
     chooseSong(num) {
-        this.audio.src = this.playlist[num - 1].src;
-        this.currentSong = num;
-        return num;
+        if (num) {
+            this.audio.src = this.playlist[num - 1].src;
+            this.currentSong = num;
+            return num;
+        } else {
+            return this.currentSong;
+        }
+    }
+
+    switchSong() {
+        let nextSong;
+        switch (this.circulationMode) {
+            case 1:
+                this.currentSong = ~~(Math.random() * this.playlist.length) + 1;
+                nextSong = this.currentSong;
+                break;
+            case 2:
+                nextSong = this.currentSong;
+                break;
+            case 3:
+                this.currentSong = this.currentSong === this.playlist.length ? 1 : (this.currentSong + 1);
+                nextSong = this.currentSong;
+                break;
+            case 4:
+                if (this.currentSong === this.playlist.length) {
+                    nextSong = 0;
+                } else {
+                    this.currentSong = this.currentSong + 1;
+                    nextSong = this.currentSong;
+                }
+                break;
+        }
+        return nextSong;
     }
 
     /**
@@ -296,7 +336,6 @@ class BPlaylist {
     static checkRange(num, lower, upper, description, functionName, thisRef) {
         thisRef = thisRef || this;
         if (!(num >= lower && num <= upper)) {
-            console.log(num);
             throw new RangeError(`${thisRef.constructor.name}::${functionName}(): ${description}超出范围，应在[${lower}, ${upper}]内`);
         }
     }
