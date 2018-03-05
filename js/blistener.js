@@ -168,7 +168,7 @@ class BListener {
     }
 
     onClickDiscPlay() {
-        bPlayer.onPlayCurrentSong();
+        this.onClickControlToggle()
     }
 
     onHoverCount(e) {

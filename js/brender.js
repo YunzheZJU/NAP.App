@@ -158,14 +158,6 @@ class BRender {
         }
     }
 
-    playPreviousSong() {
-
-    }
-
-    playNextSong() {
-
-    }
-
     /**
      * 根据传入的播放状态值改变UI的状态，包括“唱片”的转动状态和底部“播放按钮”
      * 在唱片停止转动的状态下显示一个播放按钮，并为它绑定一个事件
@@ -404,7 +396,7 @@ class BRender {
     makeUpSongPage(musicInfo) {
         const artists = BRender.makeUpArtists(musicInfo['simpleArtistInfos']);
         const tags = this.makeUpTags(musicInfo['tags']);
-        const imageUrl = `http://api.anisong.online${musicInfo['imageUrl']}`;
+        const imageUrl = `https://file.anisong.online${musicInfo['imageUrl']}`;
         const description = musicInfo['description'];
         $('#state').text(this.stateDict[musicInfo['state']]);
         $('#count-week').text(musicInfo['weekPlayCount']);
@@ -494,7 +486,7 @@ class BRender {
         const description = data['description'];
         const imageUrl = data['imageUrl'];
         $span.attr('data-original-title',
-            `${imageUrl ? `<img src='http://api.anisong.online${imageUrl}' width=100 style='padding:0;'/></br>` : ``}\
+            `${imageUrl ? `<img src='https://file.anisong.online${imageUrl}' width=100 style='padding:0;'/></br>` : ``}\
             ${description ? description : `<em>No description</em>`}`);
     }
 

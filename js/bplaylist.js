@@ -50,7 +50,7 @@ class BPlaylist {
      * @return {boolean} 返回固定值true
      */
     playContinue() {
-        if (this.audio.src) {
+        if (this.audio.src.indexOf('file') !== -1) {
             this.audio.play();
             return true
         } else {
@@ -175,7 +175,7 @@ class BPlaylist {
     }
 
     playNow() {
-        this.audio.src = `http://api.anisong.online${this.currentPageSongInfo['fileUrl']}`;
+        this.audio.src = `https://file.anisong.online${this.currentPageSongInfo['fileUrl']}`;
     }
 
     initAudioSrc() {
@@ -192,7 +192,7 @@ class BPlaylist {
             const newItem = item ? item : {
                 num: this.playlist.length + 1,
                 id: ~~this.currentPageSongInfo['id'],
-                src: `http://api.anisong.online${this.currentPageSongInfo['fileUrl']}`,
+                src: `https://file.anisong.online${this.currentPageSongInfo['fileUrl']}`,
                 title: this.currentPageSongInfo['title'],
                 artist: BRender.makeUpArtists(this.currentPageSongInfo['simpleArtistInfos']),
                 duration: ~~this.currentPageSongInfo['duration'] / 1000
@@ -235,9 +235,6 @@ class BPlaylist {
 
     setSongInfo(musicInfo) {
         this.currentPageSongInfo = musicInfo;
-        // if (!this.audio.currentSrc) {
-        //     this.audio.src = `http://api.anisong.online${this.currentPageSongInfo['fileUrl']}`;
-        // }
         return musicInfo;
     }
 
@@ -250,11 +247,13 @@ class BPlaylist {
     }
 
     highlightItem(num) {
+        this.checkListNumber(num, 'highlightItem');
         return num;
     }
 
     chooseSong(num) {
         if (num) {
+            this.checkListNumber(num, 'chooseSong');
             this.audio.src = this.playlist[num - 1].src;
             this.currentSong = num;
             return num;
