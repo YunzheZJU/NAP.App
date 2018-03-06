@@ -176,7 +176,7 @@ class BPlaylist {
     }
 
     playNow() {
-
+        this.audio.src = this.host + this.currentPageSongInfo['fileUrl'];
     }
 
     initAudioSrc() {
