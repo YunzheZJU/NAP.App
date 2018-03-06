@@ -24,6 +24,11 @@ class BPlayer {
         }
     }
 
+    setHost(host) {
+        this.bPlaylist.host = host;
+        this.bRender.host = host;
+    }
+
     onResize() {
         try {
             this.bRender.resize(this.bPlaylist.resize());
@@ -286,7 +291,7 @@ class BPlayer {
 
     onMakeUpSongPage(musicInfo) {
         try {
-            this.bRender.makeUpSongPage(this.bPlaylist.setSongInfo(musicInfo));
+            this.bRender.makeUpSongPage(this.bPlaylist.setSongInfo(musicInfo), !this.bPlaylist.audio.paused);
         } catch (e) {
             console.error(e);
         }

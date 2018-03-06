@@ -35,6 +35,8 @@ class BRender {
         this.pageType = 1;
         // “唱片”的最大旋转角
         this.needle_rotation_max = 20;
+        // PageType为1时播放歌曲与页面歌曲是否一致，影响唱片状态是否与底部播放器同步
+        this.isDiscDetached = false;
         // 记录歌曲描述段落是否被收缩
         this.isDescriptionCollected = true;
         // 记录用户是否正在寻找时间
@@ -59,6 +61,7 @@ class BRender {
                 }, 500);
             }
         });
+        this.host = 'http://api.anisong.online';
         // 创建页面元素
         this.createDom();
     }
@@ -166,23 +169,42 @@ class BRender {
     setPlayingStatus(playing) {
         // 检查参数类型
         BPlaylist.checkBoolean(playing, 'setPlayingStatus', this);
+        console.log(this.isDiscDetached);
         // 设置唱片样式
         if (playing) {
-            $('#disc-needle').css('transform', `translate(-15.15%, -9.09%) scale(0.25) rotateZ(${this.needle_rotation_max}deg)`);
-            $('#disc-play').hide(0);
-            // 不止一种触发方式，one()不适用
-            $('#disc-light').click('click', () => {
-                $('#control-toggle').click();
-            });
             $('#control-toggle').removeClass().addClass('icomoon-pause');
-            $('[id^="disc-"]').removeClass('animation-paused');
+            if (this.pageType === 1) {
+                if (this.isDiscDetached) {
+                    $('#disc-play').hide(0);
+                    $('#disc-light').off();
+                    $('[id^="disc-"]').addClass('animation-paused');
+                    $('#disc-needle').css('transform', 'translate(-15.15%, -9.09%) scale(0.25) rotateZ(-60deg)');
+                } else {
+                    $('#disc-needle').css('transform', `translate(-15.15%, -9.09%) scale(0.25) rotateZ(${this.needle_rotation_max}deg)`);
+                    $('#disc-play').hide(0);
+                    // 不止一种触发方式，one()不适用
+                    $('#disc-light').click(() => {
+                        $('#control-toggle').click();
+                    });
+                    $('[id^="disc-"]').removeClass('animation-paused');
+                }
+            }
         } else {
-            $('#disc-needle').css('transform', 'translate(-15.15%, -9.09%) scale(0.25) rotateZ(-60deg)');
-            $('#disc-play').show(0);
-            $('#disc-light').off();
             $('#control-toggle').removeClass().addClass('icomoon-play2 control-toggle-animated');
-            $('[id^="disc-"]').addClass('animation-paused');
+            if (this.pageType === 1) {
+                if (this.isDiscDetached) {
+                    $('[id^="disc-"]').addClass('animation-paused');
+                    $('#disc-needle').css('transform', 'translate(-15.15%, -9.09%) scale(0.25) rotateZ(-60deg)');
+                    $('#disc-light').off();
+                } else {
+                    $('#disc-needle').css('transform', 'translate(-15.15%, -9.09%) scale(0.25) rotateZ(-60deg)');
+                    $('#disc-play').show(0);
+                    $('#disc-light').off();
+                    $('[id^="disc-"]').addClass('animation-paused');
+                }
+            }
         }
+
     }
 
     setCountVisibility(shown) {
@@ -393,10 +415,12 @@ class BRender {
         throw new ReferenceError(`访问剪贴板时发生错误\nAction: ${e.action}\nTrigger: ${e.trigger}`);
     }
 
-    makeUpSongPage(musicInfo) {
+    makeUpSongPage(data, isPlaying) {
+        const musicInfo = data[0];
+        this.pageType = 1;
         const artists = BRender.makeUpArtists(musicInfo['simpleArtistInfos']);
         const tags = this.makeUpTags(musicInfo['tags']);
-        const imageUrl = `https://file.anisong.online${musicInfo['imageUrl']}`;
+        const imageUrl = `${this.host + musicInfo['imageUrl']}`;
         const description = musicInfo['description'];
         $('#state').text(this.stateDict[musicInfo['state']]);
         $('#count-week').text(musicInfo['weekPlayCount']);
@@ -405,7 +429,11 @@ class BRender {
         $('#description-text').text(description ? description : '暂无简介');
         $('#artist').html(artists);
         $('#album').text(musicInfo['simpleAlbumInfo']['title']);
-        $('#work').text(musicInfo['simpleWorkInfo']['title']);
+        if (musicInfo['simpleWorkInfo']) {
+            $('#work').text(musicInfo['simpleWorkInfo']['title']);
+        } else {
+            $('#tr-work').remove();
+        }
         $('#tag').empty().append(tags);
         $('#disc-cover').attr('src', imageUrl);
         $('#bg-image').attr('src', imageUrl);
@@ -413,6 +441,9 @@ class BRender {
         $('#player-container').css('bottom', '0');
         // 启用工具提示
         $('[data-toggle="tooltip"]').tooltip();
+        console.log(data);
+        this.isDiscDetached = !(data[1] === data[2]);
+        this.setPlayingStatus(isPlaying);
     }
 
     static makeUpArtists(simpleArtistInfos) {
@@ -441,7 +472,7 @@ class BRender {
     }
 
     playNow() {
-
+        this.isDiscDetached = false;
     }
 
     addToPlaylist(item, active) {
@@ -486,7 +517,7 @@ class BRender {
         const description = data['description'];
         const imageUrl = data['imageUrl'];
         $span.attr('data-original-title',
-            `${imageUrl ? `<img src='https://file.anisong.online${imageUrl}' width=100 style='padding:0;'/></br>` : ``}\
+            `${imageUrl ? `<img src='${this.host + imageUrl}' width=100 style='padding:0;'/></br>` : ``}\
             ${description ? description : `<em>No description</em>`}`);
     }
 
@@ -523,9 +554,18 @@ class BRender {
         $(`#playlist`).find(`li:nth-child(${num + 1})`).fadeOut(700).fadeIn(300);
     }
 
-    chooseSong(num) {
-        $(`#playlist`).find('li').removeClass('active');
-        $(`#playlist`).find(`li:nth-child(${num + 1})`).addClass('active');
+    chooseSong(data) {
+        if (data instanceof Array) {
+            const num = data[0];
+            const current = data[1];
+            $(`#playlist`).find('li').removeClass('active');
+            $(`#playlist`).find(`li:nth-child(${num + 1})`).addClass('active');
+            this.isDiscDetached = !(num === current);
+        } else {
+            $(`#playlist`).find('li').removeClass('active');
+            $(`#playlist`).find(`li:nth-child(${data + 1})`).addClass('active');
+        }
+        console.log(data);
     }
 
     /**

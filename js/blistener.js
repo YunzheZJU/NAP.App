@@ -136,6 +136,8 @@ class BListener {
         $('#playlist').on('addData', (e, data) => {this.onAddDataPlaylist(e, data)});
         // 添加播放列表“添加子项”的侦听器
         $('#playlist').on('addChild', (e, data) => {this.onAddChildPlaylistItems(e, data)});
+        // 添加搜索栏的提交事件
+        $('#search-form').submit((e) => {this.onSubmitSearchForm(e)});
     }
 
     changePage(id) {
@@ -143,6 +145,14 @@ class BListener {
             $('#page-container').empty().attr('data-id', id).append(data);
             this.initPage();
         });
+    }
+
+    useHttps(useHttps) {
+        if (useHttps) {
+            bPlayer.setHost('https://file.anisong.online');
+        } else {
+            bPlayer.setHost('http://api.anisong.online');
+        }
     }
 
     onResize() {
@@ -327,5 +337,13 @@ class BListener {
 
     onEndedBplayer() {
         bPlayer.onSwitchSong();
+    }
+
+    onSubmitSearchForm(e) {
+        e.preventDefault();
+        const input = ~~($('#search-box').val());
+        if (Number.isInteger(input)) {
+            this.changePage(input);
+        }
     }
 }

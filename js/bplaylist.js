@@ -21,6 +21,7 @@ class BPlaylist {
         this.currentPageSongInfo = null;
         this.timeBeforeSeeking = 0;
         this.volumeBeforeSeeking = 0;
+        this.host = 'http://api.anisong.online';
     }
 
     initPlayer() {
@@ -175,12 +176,12 @@ class BPlaylist {
     }
 
     playNow() {
-        this.audio.src = `https://file.anisong.online${this.currentPageSongInfo['fileUrl']}`;
+
     }
 
     initAudioSrc() {
         if (this.playlist.length) {
-            this.audio.src = this.playlist[0].src;
+            this.audio.src = this.host + this.playlist[0].src;
         }
     }
 
@@ -192,7 +193,7 @@ class BPlaylist {
             const newItem = item ? item : {
                 num: this.playlist.length + 1,
                 id: ~~this.currentPageSongInfo['id'],
-                src: `https://file.anisong.online${this.currentPageSongInfo['fileUrl']}`,
+                src: `${this.currentPageSongInfo['fileUrl']}`,
                 title: this.currentPageSongInfo['title'],
                 artist: BRender.makeUpArtists(this.currentPageSongInfo['simpleArtistInfos']),
                 duration: ~~this.currentPageSongInfo['duration'] / 1000
@@ -235,7 +236,9 @@ class BPlaylist {
 
     setSongInfo(musicInfo) {
         this.currentPageSongInfo = musicInfo;
-        return musicInfo;
+        const playingNum = this.currentSong;
+        const pageNum = this.findCurrentSongInPlaylist();
+        return [musicInfo, playingNum, pageNum];
     }
 
     updateTag() {
@@ -254,11 +257,12 @@ class BPlaylist {
     chooseSong(num) {
         if (num) {
             this.checkListNumber(num, 'chooseSong');
-            this.audio.src = this.playlist[num - 1].src;
+            const numOfPageSongInPlaylist = this.findCurrentSongInPlaylist();
+            this.audio.src = this.host + this.playlist[num - 1].src;
             this.currentSong = num;
-            return num;
+            return [num, numOfPageSongInPlaylist];
         } else {
-            return this.currentSong;
+            return [this.currentSong, this.currentSong];
         }
     }
 
